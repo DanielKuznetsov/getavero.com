@@ -7,8 +7,11 @@ export async function createAction() {
 
     const { data, error } = await supabase.from("todos").select("*");
 
-    console.log(data);
-    console.log(error);
+    if (error) {
+        return { success: false, message: error.message };
+    }
+
+    return { success: true, data };
 }
 
 export async function getAction() {

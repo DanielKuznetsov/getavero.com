@@ -3,7 +3,7 @@ const nextConfig = {
   async headers() {
     return [
       {
-        source: '/(.*)', // Match all routes
+        source: '/(.*)',
         headers: [
           {
             key: 'Set-Cookie',
