@@ -1,13 +1,13 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { useSignIn } from "@clerk/nextjs"
-import { z } from "zod"
-import { useForm, FormProvider } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { toast } from "sonner"
+import { useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useSignIn } from "@clerk/nextjs";
+import { z } from "zod";
+import { useForm, FormProvider } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
 import {
     Form,
     FormControl,
@@ -15,141 +15,161 @@ import {
     FormItem,
     FormLabel,
     FormMessage,
-} from "@/components/ui/form"
-import { Input } from '@/components/ui/input'
-import { LoadingButton } from "@/components/ui/custom-small/loading-button"
+} from "@/components/ui/form";
+import { Input } from '@/components/ui/input';
+import { LoadingButton } from "@/components/ui/custom-small/loading-button";
 import {
     InputOTP,
     InputOTPGroup,
     InputOTPSlot,
-} from "@/components/ui/input-otp"
-import { Button } from "@/components/ui/button"
-import { ArrowLeft } from "lucide-react"
-import { motion } from 'framer-motion'
+} from "@/components/ui/input-otp";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
+import { motion } from 'framer-motion';
 
 const formSchema = z.object({
     email: z.string().email({ message: "Invalid email address" }),
-})
+});
 
-const arrowRightIcon = <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width={18} height={18} color={"#fff"} fill={"none"}>
-    <path d="M3 12L21 12M21 12L12.5 3.5M21 12L12.5 20.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-</svg>
+const arrowRightIcon = (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width={18} height={18} color={"#fff"} fill={"none"}>
+        <path d="M3 12L21 12M21 12L12.5 3.5M21 12L12.5 20.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+);
 
 export default function LoginPage() {
-    const [isLoading, setIsLoading] = useState(false)
-    const [verifying, setVerifying] = useState(false)
-    const [email, setEmail] = useState("")
-    const [code, setCode] = useState("")
-    const [emailId, setEmailId] = useState("")
-    const router = useRouter()
-    const { isLoaded, signIn, setActive } = useSignIn()
+    const [isLoading, setIsLoading] = useState(false);
+    const [verifying, setVerifying] = useState(false);
+    const [email, setEmail] = useState("");
+    const [code, setCode] = useState("");
+    const [emailId, setEmailId] = useState("");
+    const router = useRouter();
+    const { isLoaded, signIn, setActive } = useSignIn();
 
     const form = useForm({
         resolver: zodResolver(formSchema),
         defaultValues: {
             email: "",
         },
-    })
+    });
 
     const resetState = () => {
-        setVerifying(false)
-        setEmail("")
-        setCode("")
-        setEmailId("")
-        form.reset({ email: "" })
-    }
+        // console.log("Resetting state...");
+        setVerifying(false);
+        setEmail("");
+        setCode("");
+        setEmailId("");
+        form.reset({ email: "" });
+    };
 
     async function onSubmit(values) {
-        if (!isLoaded || !signIn) return
+        // console.log("Form submitted with values:", values);
+        if (!isLoaded || !signIn) {
+            console.log("Clerk is not loaded or signIn is unavailable.");
+            return;
+        }
 
-        setIsLoading(true)
+        setIsLoading(true);
 
         try {
+            // console.log("Creating sign-in attempt...");
             const { supportedFirstFactors } = await signIn.create({
                 identifier: values.email,
-            })
+            });
+            // console.log("Supported first factors:", supportedFirstFactors);
 
             const emailCodeFactor = supportedFirstFactors?.find(
                 (factor) => factor.strategy === "email_code"
-            )
+            );
 
             if (emailCodeFactor) {
-                const { emailAddressId } = emailCodeFactor
-                setEmailId(emailAddressId)
-
+                const { emailAddressId } = emailCodeFactor;
+                setEmailId(emailAddressId);
+                // console.log("Email code factor found. Preparing first factor...");
                 await signIn.prepareFirstFactor({
                     strategy: "email_code",
                     emailAddressId,
-                })
+                });
 
-                setVerifying(true)
-                setEmail(values.email)
-                toast.success("Verification code sent to your email.")
+                setVerifying(true);
+                setEmail(values.email);
+                toast.success("Verification code sent to your email.");
             } else {
-                toast.error("Email code strategy is not supported.")
+                // console.log("Email code strategy is not supported.");
+                toast.error("Email code strategy is not supported.");
             }
         } catch (err) {
-            // console.error("Error:", JSON.stringify(err, null, 2))
-            if (err.errors && err.errors[0].code === "form_identifier_not_found") {
-                toast.error("Account not found. Please try again.")
+            // console.error("Error during sign-in creation:", err);
+            if (err.errors && err.errors[0]?.code === "form_identifier_not_found") {
+                toast.error("Account not found. Please try again.");
             } else {
-                toast.error("Failed to start the sign-in process. Please try again.")
+                toast.error("Failed to start the sign-in process. Please try again.");
             }
         } finally {
-            setIsLoading(false)
+            setIsLoading(false);
         }
     }
 
     async function handleVerification(e) {
-        e.preventDefault()
+        e.preventDefault();
+        // console.log("Verification started with code:", code);
 
-        if (!isLoaded || !signIn) return
+        if (!isLoaded || !signIn) {
+            console.log("Clerk is not loaded or signIn is unavailable.");
+            return;
+        }
 
-        setIsLoading(true)
+        setIsLoading(true);
 
         try {
+            // console.log("Attempting first factor verification...");
             const signInAttempt = await signIn.attemptFirstFactor({
                 strategy: "email_code",
                 code,
-            })
+            });
+
+            // console.log("Sign-in attempt result:", signInAttempt);
 
             if (signInAttempt.status === "complete") {
-                toast.success("Successfully signed in!")
-                await setActive({ session: signInAttempt.createdSessionId })
+                toast.success("Successfully signed in!");
+                // console.log("Sign-in complete. Setting active session...");
+                await setActive({ session: signInAttempt.createdSessionId });
 
-                resetState()
-
-                // Route upon successful sign-in
-                router.push("/")
-                router.refresh()
+                resetState();
+                router.push("/");
+                router.refresh();
             } else {
-                // console.error(signInAttempt)
-                toast.error("Verification failed. Please try again.")
+                // console.error("Verification failed:", signInAttempt);
+                toast.error("Verification failed. Please try again.");
             }
         } catch (err) {
-            // console.error("Error:", JSON.stringify(err, null, 2))
-            if (err.errors && err.errors[0].code === "form_code_incorrect") {
-                toast.error("Incorrect verification code. Please try again.")
+            // console.error("Error during verification:", err);
+            if (err.errors && err.errors[0]?.code === "form_code_incorrect") {
+                toast.error("Incorrect verification code. Please try again.");
             } else {
-                toast.error("Verification failed. Please try again.")
+                toast.error("Verification failed. Please try again.");
             }
         } finally {
-            setIsLoading(false)
+            setIsLoading(false);
         }
     }
 
     async function handleResendOTP() {
-        if (!isLoaded || !signIn) return
+        // console.log("Resending OTP to email ID:", emailId);
+        if (!isLoaded || !signIn) {
+            console.log("Clerk is not loaded or signIn is unavailable.");
+            return;
+        }
 
         try {
             await signIn.prepareFirstFactor({
                 strategy: "email_code",
                 emailAddressId: emailId,
-            })
-            toast.success("A new verification code has been sent to your email.")
+            });
+            toast.success("A new verification code has been sent to your email.");
         } catch (err) {
-            // console.error("Error resending OTP:", JSON.stringify(err, null, 2))
-            toast.error("Failed to resend verification code. Please try again.")
+            // console.error("Error resending OTP:", err);
+            toast.error("Failed to resend verification code. Please try again.");
         }
     }
 
@@ -256,5 +276,5 @@ export default function LoginPage() {
                 </div>
             </div>
         </div>
-    )
+    );
 }

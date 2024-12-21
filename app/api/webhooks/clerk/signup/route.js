@@ -1,3 +1,5 @@
+'use server'
+
 import { Webhook } from "svix";
 import { headers } from "next/headers";
 import supabase from "@/utils/supabase/client"
@@ -24,11 +26,11 @@ export async function POST(req) {
     console.log("Body:", body);
     console.log("CLERK_WEBHOOK_SECRET:", CLERK_WEBHOOK_SECRET);
 
-    const headerPayload = headers();
+    const headerPayload = await headers();
     const svix_id = headerPayload.get("svix-id");
     const svix_timestamp = headerPayload.get("svix-timestamp");
     const svix_signature = headerPayload.get("svix-signature");
-
+        
     // Log svix headers for debugging
     console.log("svix-id:", svix_id);
     console.log("svix-timestamp:", svix_timestamp);
@@ -94,7 +96,7 @@ async function saveUserDataToDatabase(user) {
 
     const { data, error } = await supabase
         .from("users")
-        .insert([{ clerk_id: id, clerk_email: email, first_name: firstName, last_name: lastName, role: "participant" }]);
+        .insert([{ clerk_id: id, clerk_email: email, first_name: firstName, last_name: lastName }]);
 
     if (error) {
         console.error("Error inserting user into database:", error);
