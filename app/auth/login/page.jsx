@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useSignIn } from "@clerk/nextjs";
@@ -24,7 +24,7 @@ import {
     InputOTPSlot,
 } from "@/components/ui/input-otp";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const formSchema = z.object({
@@ -53,8 +53,18 @@ export default function LoginPage() {
         },
     });
 
+    // Effect to handle autofill
+    useEffect(() => {
+        const emailInput = document.querySelector('input[name="email"]');
+        if (emailInput) {
+            const value = emailInput.value;
+            if (value) {
+                form.setValue('email', value);
+            }
+        }
+    }, [form]);
+
     const resetState = () => {
-        // console.log("Resetting state...");
         setVerifying(false);
         setEmail("");
         setCode("");
@@ -63,7 +73,6 @@ export default function LoginPage() {
     };
 
     async function onSubmit(values) {
-        // console.log("Form submitted with values:", values);
         if (!isLoaded || !signIn) {
             console.log("Clerk is not loaded or signIn is unavailable.");
             return;
@@ -72,11 +81,9 @@ export default function LoginPage() {
         setIsLoading(true);
 
         try {
-            // console.log("Creating sign-in attempt...");
             const { supportedFirstFactors } = await signIn.create({
                 identifier: values.email,
             });
-            // console.log("Supported first factors:", supportedFirstFactors);
 
             const emailCodeFactor = supportedFirstFactors?.find(
                 (factor) => factor.strategy === "email_code"
@@ -85,7 +92,6 @@ export default function LoginPage() {
             if (emailCodeFactor) {
                 const { emailAddressId } = emailCodeFactor;
                 setEmailId(emailAddressId);
-                // console.log("Email code factor found. Preparing first factor...");
                 await signIn.prepareFirstFactor({
                     strategy: "email_code",
                     emailAddressId,
@@ -95,11 +101,9 @@ export default function LoginPage() {
                 setEmail(values.email);
                 toast.success("Verification code sent to your email.");
             } else {
-                // console.log("Email code strategy is not supported.");
                 toast.error("Email code strategy is not supported.");
             }
         } catch (err) {
-            // console.error("Error during sign-in creation:", err);
             if (err.errors && err.errors[0]?.code === "form_identifier_not_found") {
                 toast.error("Account not found. Please try again.");
             } else {
@@ -112,7 +116,6 @@ export default function LoginPage() {
 
     async function handleVerification(e) {
         e.preventDefault();
-        // console.log("Verification started with code:", code);
 
         if (!isLoaded || !signIn) {
             console.log("Clerk is not loaded or signIn is unavailable.");
@@ -122,28 +125,22 @@ export default function LoginPage() {
         setIsLoading(true);
 
         try {
-            // console.log("Attempting first factor verification...");
             const signInAttempt = await signIn.attemptFirstFactor({
                 strategy: "email_code",
                 code,
             });
 
-            // console.log("Sign-in attempt result:", signInAttempt);
-
             if (signInAttempt.status === "complete") {
                 toast.success("Successfully signed in!");
-                // console.log("Sign-in complete. Setting active session...");
                 await setActive({ session: signInAttempt.createdSessionId });
 
                 resetState();
                 router.push("/");
                 router.refresh();
             } else {
-                // console.error("Verification failed:", signInAttempt);
                 toast.error("Verification failed. Please try again.");
             }
         } catch (err) {
-            // console.error("Error during verification:", err);
             if (err.errors && err.errors[0]?.code === "form_code_incorrect") {
                 toast.error("Incorrect verification code. Please try again.");
             } else {
@@ -155,7 +152,6 @@ export default function LoginPage() {
     }
 
     async function handleResendOTP() {
-        // console.log("Resending OTP to email ID:", emailId);
         if (!isLoaded || !signIn) {
             console.log("Clerk is not loaded or signIn is unavailable.");
             return;
@@ -168,7 +164,6 @@ export default function LoginPage() {
             });
             toast.success("A new verification code has been sent to your email.");
         } catch (err) {
-            // console.error("Error resending OTP:", err);
             toast.error("Failed to resend verification code. Please try again.");
         }
     }
@@ -254,7 +249,17 @@ export default function LoginPage() {
                                                 <FormItem>
                                                     <FormLabel className='text-primary'>Email</FormLabel>
                                                     <FormControl>
-                                                        <Input type="email" placeholder="Enter your email" {...field} />
+                                                        <Input 
+                                                            type="email" 
+                                                            placeholder="Enter your email" 
+                                                            {...field} 
+                                                            onBlur={(e) => {
+                                                                field.onBlur();
+                                                                if (e.target.value !== field.value) {
+                                                                    form.setValue('email', e.target.value);
+                                                                }
+                                                            }}
+                                                        />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -278,3 +283,4 @@ export default function LoginPage() {
         </div>
     );
 }
+
