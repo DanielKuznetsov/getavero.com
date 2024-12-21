@@ -14,8 +14,6 @@ export default async function TestPage() {
 
             <Button onClick={createTodo}>Create Todo</Button>
             <Button variant="destructive" onClick={removeTodo}>Remove Todo</Button>
-
-
         </div>
     )
 }
