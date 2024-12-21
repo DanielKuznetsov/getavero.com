@@ -1,5 +1,5 @@
 import Image from "next/image";
-import TestPage from "@/components/TestPage";
+import TestPage from "@/components/pages/TestPage";
 
 export default async function Home() {
 
