@@ -5,6 +5,7 @@ import { NextResponse } from "next/server";
 const isProtectedRoute = createRouteMatcher([
   // TODO: add more protected routes
   "/private", // —> just an example
+  "/orders/(.*)"
 ]);
 
 // Define authentication routes
