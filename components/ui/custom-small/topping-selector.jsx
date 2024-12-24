@@ -21,9 +21,9 @@ export function ToppingSelector({ topping, value, onChange }) {
 
     return (
         <div className="grid gap-2">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center">
                 <Label className="underline">{topping.name}</Label>
-                <span className="text-gray-500">+${topping.price.toFixed(2)}</span>
+                {/* <span className="text-gray-500">+${topping.price.toFixed(2)}</span> */}
             </div>
 
             <RadioGroup

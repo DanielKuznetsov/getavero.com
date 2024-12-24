@@ -14,6 +14,7 @@ import { pizzas, pizzaSizes, pizzaToppings, pizzaMods } from '@/lib/menu-data'
 import { ToppingSelector } from '@/components/ui/custom-small/topping-selector'
 import { RemovableToppings } from '@/components/ui/custom-small/removable-toppings'
 import { Checkbox } from '@/components/ui/checkbox'
+import { X } from 'lucide-react'
 
 export function OrderForm({ addItemToOrder }) {
     const [selectedSize, setSelectedSize] = useState(pizzaSizes[0].size);
@@ -34,7 +35,11 @@ export function OrderForm({ addItemToOrder }) {
             setQuantity(1);
             setNotes("");
         }
-    }, [selectedPizza]);
+
+        if (!isDialogOpen) {
+            setSelectedPizza(null);
+        }
+    }, [selectedPizza, isDialogOpen]);
 
     const calculatePrice = (pizza) => {
         if (!pizza) return 0;
@@ -49,9 +54,10 @@ export function OrderForm({ addItemToOrder }) {
 
         let total = basePrice;
 
+        // Calculate toppings price using size-specific topping prices
         Object.entries(extraToppings).forEach(([topping, placement]) => {
             if (placement !== "none") {
-                const toppingPrice = pizzaToppings.find(t => t.name === topping)?.price;
+                const toppingPrice = pizzaSizes[sizeIndex].toppingPrice;
                 total += placement === "whole" ? toppingPrice : toppingPrice / 2;
             }
         });
@@ -184,15 +190,37 @@ export function OrderForm({ addItemToOrder }) {
                                                 <AccordionTrigger>Add Extra Toppings</AccordionTrigger>
                                                 <AccordionContent className="space-y-4">
                                                     {pizzaToppings.map((topping) => (
-                                                        <ToppingSelector
-                                                            key={topping.name}
-                                                            topping={topping}
-                                                            value={extraToppings[topping.name] || "none"}
-                                                            onChange={(value) => setExtraToppings({
-                                                                ...extraToppings,
-                                                                [topping.name]: value
-                                                            })}
-                                                        />
+                                                        <div key={topping.name} className="relative">
+                                                            <ToppingSelector
+                                                                key={topping.name}
+                                                                topping={{
+                                                                    ...topping,
+                                                                    price: pizzaSizes[pizzaSizes.findIndex(s => s.size === selectedSize)].toppingPrice
+                                                                }}
+                                                                value={extraToppings[topping.name] || "none"}
+                                                                onChange={(value) => setExtraToppings({
+                                                                    ...extraToppings,
+                                                                    [topping.name]: value
+                                                                })}
+                                                            />
+                                                            {extraToppings[topping.name] && extraToppings[topping.name] !== "none" && (
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="icon"
+                                                                    className="absolute right-0 top-0 h-6 w-6"
+                                                                    onClick={(e) => {
+                                                                        e.preventDefault();
+                                                                        setExtraToppings({
+                                                                            ...extraToppings,
+                                                                            [topping.name]: "none"
+                                                                        });
+                                                                    }}
+                                                                >
+                                                                    <X className="h-4 w-4" />
+                                                                    <span className="sr-only">Remove {topping.name}</span>
+                                                                </Button>
+                                                            )}
+                                                        </div>
                                                     ))}
                                                 </AccordionContent>
                                             </AccordionItem>
