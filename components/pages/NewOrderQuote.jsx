@@ -10,6 +10,7 @@ import logo from "@/public/logo.png"
 import { useRouter } from 'next/navigation'
 import { Button } from "@/components/ui/button"
 import { OrderForm } from "@/components/ui/custom-large/order-form"
+import { addOrder } from "@/app/actions/order-actions"
 import {
     Form,
     FormControl,
@@ -40,7 +41,7 @@ const formSchema = z.object({
     paymentMethod: z.enum(["credit card", "purchase order"]),
     deliveryAddress: z.string().optional(),
     deliveryInstructions: z.string().optional(),
-    createdBy: z.string().min(2, { message: "Enter name of person creating the order." }),
+    preparedBy: z.string().min(2, { message: "Enter name of person creating the order." }),
     gratuityAmount: z.number().min(0, { message: "Gratuity amount must be 0 or greater." }),
     gratuityType: z.enum(["$", "%"])
 })
@@ -54,7 +55,7 @@ const defaultFormValues = {
     paymentMethod: "purchase order",
     deliveryAddress: "",
     deliveryInstructions: "",
-    createdBy: "",
+    preparedBy: "",
     gratuityAmount: 0,
     gratuityType: "$"
 }
@@ -95,13 +96,22 @@ export default function NewOrderQuote() {
             return
         }
 
-        console.log("values, orderItems")
-        console.log(values, orderItems)
-
         setIsLoading(true)
 
         try {
-            const response = await addOrder(values)
+            const orderData = {
+                ...values,
+                orderItems,
+                subtotal: calculateSubtotal(),
+                tax: calculateTax(),
+                gratuity: calculateGratuity(),
+                processingFee: calculateInvoiceProcessingFee(),
+                total: calculateTotal(),
+                quoteNumber: quoteNumber,
+                created_on: new Date().toLocaleDateString()
+            }
+
+            const response = await addOrder(orderData)
 
             if (response.success) {
                 toast.success(response.message)
@@ -109,7 +119,8 @@ export default function NewOrderQuote() {
                 setOrderItems([])
 
                 // TODO: Add the logic to redirect to the actual order page
-                router.push(`/orders/${response.orderId}`)
+                // router.push(`/orders/${response.orderId}`)
+                router.push("/")
             } else {
                 toast.error(response.message)
             }
@@ -318,10 +329,10 @@ export default function NewOrderQuote() {
                                     <div className="grid grid-cols-2 space-y-0 space-x-4">
                                         <FormField
                                             control={form.control}
-                                            name="createdBy"
+                                            name="preparedBy"
                                             render={({ field }) => (
                                                 <FormItem>
-                                                    <FormLabel className='text-[#1f2937]'>Created By</FormLabel>
+                                                    <FormLabel className='text-[#1f2937]'>Prepared By</FormLabel>
                                                     <FormControl>
                                                         <Input placeholder="Name of person creating the order" {...field} />
                                                     </FormControl>
@@ -390,7 +401,7 @@ export default function NewOrderQuote() {
                         </div>
 
                         <div className='mt-6 flex justify-end'>
-                            <Button type="submit" disabled={isLoading || orderItems.length === 0 || !form.getValues().deliveryAddress || !form.getValues().deliveryInstructions || !form.getValues().createdBy}>
+                            <Button type="submit" disabled={isLoading || orderItems.length === 0 || !form.getValues().deliveryAddress || !form.getValues().deliveryInstructions || !form.getValues().preparedBy}>
                                 {isLoading ? 'Creating order...' : 'Create order'}
                             </Button>
                         </div>
@@ -404,7 +415,7 @@ export default function NewOrderQuote() {
                     <div>
                         <h4 className="scroll-m-20 text-xl font-semibold tracking-tight">Quote #{String(quoteNumber).slice(-5)}</h4>
                         <p>Created on: {new Date().toLocaleDateString()}</p>
-                        <p>Prepared by: {form.getValues().createdBy}</p>
+                        <p>Prepared by: {form.getValues().preparedBy}</p>
                     </div>
                 </div>
 
@@ -454,12 +465,12 @@ export default function NewOrderQuote() {
                                 <div className="grid grid-cols-7 border-b border-gray-200 items-center">
                                     <p className="py-2 px-4 text-sm">{item.name} ({item.size})</p>
                                     <p className="py-2 px-4 text-sm">{item.quantity}</p>
-                                    <p className="py-2 px-4 text-sm">${(item.isSpecialty 
+                                    <p className="py-2 px-4 text-sm">${(item.isSpecialty
                                         ? item.specialtyPrices[pizzaSizes.findIndex(s => s.size === item.size)]
                                         : pizzaSizes.find(s => s.size === item.size)?.basePrice || 0).toFixed(2)}</p>
                                     <p className="py-2 px-4 text-sm">Base pizza</p>
                                     <p className="py-2 px-4 text-sm">{item.notes || '-'}</p>
-                                    <p className="py-2 px-4 text-sm">${((item.isSpecialty 
+                                    <p className="py-2 px-4 text-sm">${((item.isSpecialty
                                         ? item.specialtyPrices[pizzaSizes.findIndex(s => s.size === item.size)]
                                         : pizzaSizes.find(s => s.size === item.size)?.basePrice || 0) * item.quantity).toFixed(2)}</p>
                                     <div className="py-2 px-4 text-sm flex space-x-2 flex items-center justify-start">
@@ -475,23 +486,34 @@ export default function NewOrderQuote() {
                                             <p className="py-2 px-4 text-sm"></p>
                                             <p className="py-2 px-4 text-sm">{item.quantity}</p>
                                             <p className="py-2 px-4 text-sm">
-                                                ${((pizzaToppings.find(t => t.name === topping)?.price || 0) * 
-                                                (placement === 'whole' ? 1 : 0.5) * 
-                                                (pizzaSizes.find(s => s.size === item.size)?.toppingPrice || 1) / 
-                                                pizzaSizes[0].toppingPrice).toFixed(2)}
+                                                ${((pizzaToppings.find(t => t.name === topping)?.price || 0) *
+                                                    (placement === 'whole' ? 1 : 0.5) *
+                                                    (pizzaSizes.find(s => s.size === item.size)?.toppingPrice || 1) /
+                                                    pizzaSizes[0].toppingPrice).toFixed(2)}
                                             </p>
                                             <p className="py-2 px-4 text-sm">{topping} ({placement})</p>
                                             <p className="py-2 px-4 text-sm">-</p>
                                             <p className="py-2 px-4 text-sm">
-                                                ${((pizzaToppings.find(t => t.name === topping)?.price || 0) * 
-                                                (placement === 'whole' ? 1 : 0.5) * 
-                                                (pizzaSizes.find(s => s.size === item.size)?.toppingPrice || 1) / 
-                                                pizzaSizes[0].toppingPrice * 
-                                                item.quantity).toFixed(2)}
+                                                ${((pizzaToppings.find(t => t.name === topping)?.price || 0) *
+                                                    (placement === 'whole' ? 1 : 0.5) *
+                                                    (pizzaSizes.find(s => s.size === item.size)?.toppingPrice || 1) /
+                                                    pizzaSizes[0].toppingPrice *
+                                                    item.quantity).toFixed(2)}
                                             </p>
                                             <p className="py-2 px-4 text-sm"></p>
                                         </div>
                                     )
+                                ))}
+                                {item.removedToppings.map((topping) => (
+                                    <div key={`${index}-${topping}-removed`} className="grid grid-cols-7 border-b border-gray-200 bg-gray-50">
+                                        <p className="py-2 px-4 text-sm"></p>
+                                        <p className="py-2 px-4 text-sm">{item.quantity}</p>
+                                        <p className="py-2 px-4 text-sm">$0.00</p>
+                                        <p className="py-2 px-4 text-sm">Remove {topping}</p>
+                                        <p className="py-2 px-4 text-sm">-</p>
+                                        <p className="py-2 px-4 text-sm">$0.00</p>
+                                        <p className="py-2 px-4 text-sm"></p>
+                                    </div>
                                 ))}
                                 {Object.entries(item.mods).map(([mod, isSelected]) => (
                                     isSelected && (

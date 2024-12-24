@@ -9,6 +9,98 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      customers: {
+        Row: {
+          created_at: string
+          email_address: string | null
+          first_name: string | null
+          id: string
+          last_name: string | null
+          phone_number: string | null
+        }
+        Insert: {
+          created_at?: string
+          email_address?: string | null
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          phone_number?: string | null
+        }
+        Update: {
+          created_at?: string
+          email_address?: string | null
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          phone_number?: string | null
+        }
+        Relationships: []
+      }
+      orders: {
+        Row: {
+          created_at: string
+          created_on: string | null
+          customer_id: string | null
+          delivery_address: string | null
+          delivery_instructions: string | null
+          gratuity: string | null
+          id: string
+          invoice_processing_fee: string | null
+          order_itself: Json | null
+          order_type: string | null
+          payment_method: string | null
+          prepared_by: string | null
+          quote_number: string | null
+          subtotal: string | null
+          tax: string | null
+          total: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_on?: string | null
+          customer_id?: string | null
+          delivery_address?: string | null
+          delivery_instructions?: string | null
+          gratuity?: string | null
+          id?: string
+          invoice_processing_fee?: string | null
+          order_itself?: Json | null
+          order_type?: string | null
+          payment_method?: string | null
+          prepared_by?: string | null
+          quote_number?: string | null
+          subtotal?: string | null
+          tax?: string | null
+          total?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_on?: string | null
+          customer_id?: string | null
+          delivery_address?: string | null
+          delivery_instructions?: string | null
+          gratuity?: string | null
+          id?: string
+          invoice_processing_fee?: string | null
+          order_itself?: Json | null
+          order_type?: string | null
+          payment_method?: string | null
+          prepared_by?: string | null
+          quote_number?: string | null
+          subtotal?: string | null
+          tax?: string | null
+          total?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       todos: {
         Row: {
           created_at: string
