@@ -161,7 +161,7 @@ export default function NewOrderQuote() {
     return (
         <div className="py-4 px-6">
             <div className="border-b border-gray-200 pb-12">
-                <h1 className="scroll-m-20 text-2xl font-semibold tracking-tight">Start a new catering order</h1>
+                <h1 className="scroll-m-20 text-2xl font-semibold tracking-tight">New catering order form</h1>
                 <p className="text-sm text-gray-500">Please fill out the form below to start a new order. Order details will be displayed on the right side along similar to an itemized invoice.</p>
 
                 <Form {...form}>
@@ -452,7 +452,7 @@ export default function NewOrderQuote() {
                         orderItems.map((item, index) => (
                             <React.Fragment key={index}>
                                 <div className="grid grid-cols-6 border-b border-gray-200 items-center">
-                                    <p className="py-2 px-4 text-sm">{item.name}</p>
+                                    <p className="py-2 px-4 text-sm">{item.name} ({item.size})</p>
                                     <p className="py-2 px-4 text-sm">{item.quantity}</p>
                                     <p className="py-2 px-4 text-sm">${item.basePrice.toFixed(2)}</p>
                                     <p className="py-2 px-4 text-sm">Base pizza</p>
