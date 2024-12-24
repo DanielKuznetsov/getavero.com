@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/select"
 import { toast } from "sonner"
 import { Label } from "@/components/ui/label"
-import { pizzaToppings, pizzaMods, pizzaSizes } from "@/lib/menu-data"
+import { pizzaToppings, pizzaMods, pizzaSizes, menuItems, salads, saladSizes, saladMods } from "@/lib/menu-data"
 import { Trash2, Edit } from 'lucide-react'
 
 const formSchema = z.object({
@@ -117,9 +117,6 @@ export default function NewOrderQuote() {
                 toast.success(response.message)
                 form.reset(defaultFormValues)
                 setOrderItems([])
-
-                // TODO: Add the logic to redirect to the actual order page
-                // router.push(`/orders/${response.orderId}`)
                 router.push("/")
             } else {
                 toast.error(response.message)
@@ -394,7 +391,7 @@ export default function NewOrderQuote() {
 
                                     <div className="flex flex-col gap-2">
                                         <Label className="text-sm">Add items to the order</Label>
-                                        <OrderForm addItemToOrder={addItemToOrder} />
+                                        <OrderForm addItemToOrder={addItemToOrder} menuItems={menuItems} />
                                     </div>
                                 </div>
                             </div>
@@ -457,22 +454,30 @@ export default function NewOrderQuote() {
                     {orderItems.length === 0 ? (
                         <div className="col-span-7 text-center py-8 bg-gray-50 border-b border-gray-200">
                             <p className="text-lg font-semibold text-gray-500">Your order is empty</p>
-                            <p className="text-sm text-gray-400">Add some delicious pizzas to get started!</p>
+                            <p className="text-sm text-gray-400">Add some delicious items to get started!</p>
                         </div>
                     ) : (
                         orderItems.map((item, index) => (
                             <React.Fragment key={index}>
                                 <div className="grid grid-cols-7 border-b border-gray-200 items-center">
-                                    <p className="py-2 px-4 text-sm">{item.name} ({item.size})</p>
+                                    <p className="py-2 px-4 text-sm">{item.name} {item.size && `(${item.size})`}</p>
                                     <p className="py-2 px-4 text-sm">{item.quantity}</p>
-                                    <p className="py-2 px-4 text-sm">${(item.isSpecialty
-                                        ? item.specialtyPrices[pizzaSizes.findIndex(s => s.size === item.size)]
-                                        : pizzaSizes.find(s => s.size === item.size)?.basePrice || 0).toFixed(2)}</p>
-                                    <p className="py-2 px-4 text-sm">Base pizza</p>
+                                    <p className="py-2 px-4 text-sm">
+                                        ${Array.isArray(item.basePrice) 
+                                            ? item.basePrice[0].toFixed(2) + ' - ' + item.basePrice[item.basePrice.length - 1].toFixed(2)
+                                            : (typeof item.basePrice === 'number' 
+                                                ? item.basePrice.toFixed(2) 
+                                                : '0.00'
+                                              )
+                                        }
+                                    </p>
+                                    <p className="py-2 px-4 text-sm">
+                                        {item.extraToppings && Object.keys(item.extraToppings).length > 0 && 'Extra Toppings'}
+                                        {item.removedToppings && item.removedToppings.length > 0 && 'Removed Toppings'}
+                                        {item.mods && Object.keys(item.mods).length > 0 && 'Modifications'}
+                                    </p>
                                     <p className="py-2 px-4 text-sm">{item.notes || '-'}</p>
-                                    <p className="py-2 px-4 text-sm">${((item.isSpecialty
-                                        ? item.specialtyPrices[pizzaSizes.findIndex(s => s.size === item.size)]
-                                        : pizzaSizes.find(s => s.size === item.size)?.basePrice || 0) * item.quantity).toFixed(2)}</p>
+                                    <p className="py-2 px-4 text-sm">${item.totalPrice.toFixed(2)}</p>
                                     <div className="py-2 px-4 text-sm flex space-x-2 flex items-center justify-start">
                                         <Button size="sm" variant="outline" onClick={() => removeItemFromOrder(index)}>
                                             Delete <Trash2 className="h-4 w-4" />
@@ -480,7 +485,7 @@ export default function NewOrderQuote() {
                                     </div>
                                 </div>
 
-                                {Object.entries(item.extraToppings).map(([topping, placement]) => (
+                                {item.extraToppings && Object.entries(item.extraToppings).map(([topping, placement]) => (
                                     placement !== 'none' && (
                                         <div key={`${index}-${topping}`} className="grid grid-cols-7 border-b border-gray-200 bg-gray-50">
                                             <p className="py-2 px-4 text-sm"></p>
@@ -504,7 +509,7 @@ export default function NewOrderQuote() {
                                         </div>
                                     )
                                 ))}
-                                {item.removedToppings.map((topping) => (
+                                {item.removedToppings && item.removedToppings.map((topping) => (
                                     <div key={`${index}-${topping}-removed`} className="grid grid-cols-7 border-b border-gray-200 bg-gray-50">
                                         <p className="py-2 px-4 text-sm"></p>
                                         <p className="py-2 px-4 text-sm">{item.quantity}</p>
@@ -515,7 +520,7 @@ export default function NewOrderQuote() {
                                         <p className="py-2 px-4 text-sm"></p>
                                     </div>
                                 ))}
-                                {Object.entries(item.mods).map(([mod, isSelected]) => (
+                                {item.mods && Object.entries(item.mods).map(([mod, isSelected]) => (
                                     isSelected && (
                                         <div key={`${index}-${mod}`} className="grid grid-cols-7 border-b border-gray-200 bg-gray-50">
                                             <p className="py-2 px-4 text-sm"></p>
@@ -528,6 +533,30 @@ export default function NewOrderQuote() {
                                             <p className="py-2 px-4 text-sm">
                                                 ${((pizzaMods.find(m => m.name === mod)?.price || 0) * item.quantity).toFixed(2)}
                                             </p>
+                                            <p className="py-2 px-4 text-sm"></p>
+                                        </div>
+                                    )
+                                ))}
+                                {item.salad && (
+                                    <div key={`${index}-${item.salad}`} className="grid grid-cols-7 border-b border-gray-200 bg-gray-50">
+                                        <p className="py-2 px-4 text-sm"></p>
+                                        <p className="py-2 px-4 text-sm">{item.quantity}</p>
+                                        <p className="py-2 px-4 text-sm">$0.00</p>
+                                        <p className="py-2 px-4 text-sm">{item.salad}</p>
+                                        <p className="py-2 px-4 text-sm">-</p>
+                                        <p className="py-2 px-4 text-sm">$0.00</p>
+                                        <p className="py-2 px-4 text-sm"></p>
+                                    </div>
+                                )}
+                                {item.saladMods && Object.entries(item.saladMods).map(([mod, isSelected]) => (
+                                    isSelected && (
+                                        <div key={`${index}-${mod}`} className="grid grid-cols-7 border-b border-gray-200 bg-gray-50">
+                                            <p className="py-2 px-4 text-sm"></p>
+                                            <p className="py-2 px-4 text-sm">{item.quantity}</p>
+                                            <p className="py-2 px-4 text-sm">$0.00</p>
+                                            <p className="py-2 px-4 text-sm">{mod}</p>
+                                            <p className="py-2 px-4 text-sm">-</p>
+                                            <p className="py-2 px-4 text-sm">$0.00</p>
                                             <p className="py-2 px-4 text-sm"></p>
                                         </div>
                                     )
