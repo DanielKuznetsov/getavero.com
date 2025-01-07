@@ -51,14 +51,15 @@ export default function NewRestaurantForm() {
             // console.log(values)
             const result = await addNewRestaurant(values)
 
-            console.log("result")
-            console.log(result)
+            // console.log("result")
+            // console.log(result)
+
             if (result.success) {
                 toast.success(result.message)
             } else {
                 toast.error(result.message)
             }
-            // form.reset()
+            form.reset()
         } catch (error) {
             console.error("Error submitting form:", error)
             toast.error("An error occurred while submitting the form.")

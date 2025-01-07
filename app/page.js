@@ -1,4 +1,6 @@
 import NewRestaurantForm from "@/components/ui/custom-large/new-restaurant-form";
+import AddMenuItems from "@/components/ui/custom-large/add-menu-items";
+import AddDishCategories from "@/components/ui/custom-large/add-dish-categories";
 
 export default async function Home() {
 
@@ -9,7 +11,11 @@ export default async function Home() {
 
       {/* Edit Restaurant */}
 
+      {/* Add Dish Categories */}
+      <AddDishCategories />
+
       {/* Add Menu Items */}
+      <AddMenuItems />
 
       {/* Edit Menu Items */}
     </div>

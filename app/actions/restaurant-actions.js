@@ -31,3 +31,33 @@ export async function addNewRestaurant(restaurantData) {
         return { success: true, message: "Restaurant added successfully", restaurant_data: restaurant_data };
     }
 }
+
+export async function getRestaurants() {
+    const { data, error } = await supabase.from("restaurants").select("*");
+
+    if (error) {
+        return { success: false, message: "Error fetching restaurants", error };
+    } else {
+        return { success: true, message: "Restaurants fetched successfully", restaurants: data };
+    }
+}
+
+export async function insertDishCategory(dishCategoryData) {
+    // IF category name already exists, return error
+    const { data: category_data, error: category_error } = await supabase.from("dish_categories").select("*").eq("name", dishCategoryData.categoryName);
+    if (category_data.length > 0) {
+        return { success: false, message: "Dish category already exists" };
+    }
+
+
+    const { data, error } = await supabase.from("dish_categories").insert({
+        name: dishCategoryData.categoryName,
+        restaurant_id: dishCategoryData.restaurantId,
+    });
+
+    if (error) {
+        return { success: false, message: "Error adding dish category" };
+    } else {
+        return { success: true, message: "Dish category added successfully", dish_category_data: data };
+    }
+}
