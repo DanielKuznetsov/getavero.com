@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useSignUp } from "@clerk/nextjs"
 import { useRouter } from "next/navigation"
 import { ArrowLeft } from "lucide-react"
@@ -45,11 +45,12 @@ const arrowRightIcon = <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 2
 </svg>
 
 export default function SignUpPage() {
+  const router = useRouter()
+
   const [isLoading, setIsLoading] = useState(false)
   const [verifying, setVerifying] = useState(false)
   const [email, setEmail] = useState("")
   const [code, setCode] = useState("")
-  const router = useRouter()
   const { isLoaded, signUp, setActive } = useSignUp()
 
   const form = useForm({
@@ -139,8 +140,12 @@ export default function SignUpPage() {
     }
   }
 
+  useEffect(() => {
+    router.push("/auth/login")
+  }, [])
+
   return null
-  // <div className="min-h-screen flex flex-col">
+  // (<div className="min-h-screen flex flex-col">
   //   <div className="flex-1 flex flex-col justify-center items-center p-4">
   //     <div className="w-full">
   //       <div className="mb-8 absolute top-4 left-4">
@@ -275,5 +280,5 @@ export default function SignUpPage() {
   //       </motion.div>
   //     </div>
   //   </div>
-  // </div>
+  // </div>)
 }

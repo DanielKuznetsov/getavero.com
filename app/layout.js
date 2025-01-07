@@ -2,6 +2,10 @@ import localFont from "next/font/local";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from 'sonner'
 import "./globals.css";
+import { SignedIn, SignedOut } from "@clerk/nextjs";
+import { NavigationSignedOut } from "@/components/ui/custom-large/navigation";
+import { Suspense } from 'react';
+import Loading from "@/components/ui/custom-small/loading";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -31,7 +35,15 @@ export default function RootLayout({
     <ClerkProvider publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}>
       <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
         <body className="antialiased bg-background text-foreground">
-          {children}
+          <Suspense fallback={<Loading />}>
+            <SignedIn>
+              <NavigationSignedOut />
+              {children}
+            </SignedIn>
+            <SignedOut>
+              {children}
+            </SignedOut>
+          </Suspense>
 
           <Toaster richColors position="top-center" expand={false} closeButton />
         </body>
@@ -39,3 +51,4 @@ export default function RootLayout({
     </ClerkProvider>
   );
 }
+

@@ -11,7 +11,7 @@ const isProtectedRoute = createRouteMatcher([
 // Define authentication routes
 const isAuthRoute = createRouteMatcher([
   "/auth/login",
-  "/auth/signup",
+  // "/auth/signup",
 ]);
 
 // Use clerkMiddleware to handle authentication
