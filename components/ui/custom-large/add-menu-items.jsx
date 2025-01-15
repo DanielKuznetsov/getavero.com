@@ -70,6 +70,10 @@ const standardJsonObjects = {
     {
       "name": "23 inch",
       "price": 0
+    },
+    {
+      "name": "slice",
+      "price": 0
     }
   ],
   "options": [
@@ -107,6 +111,10 @@ const standardJsonObjects = {
     {
       "name": "23 inch",
       "price": 0
+    },
+    {
+      "name": "slice",
+      "price": 0.75
     }
   ],
   "options": [
