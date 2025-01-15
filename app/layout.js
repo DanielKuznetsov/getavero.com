@@ -40,7 +40,7 @@ export default function RootLayout({
             <SignedIn>
               <SidebarProvider>
                 <AppSidebar />
-                {/* <NavigationSignedOut /> */}
+                {/* <SidebarTrigger /> */}
                 {children}
               </SidebarProvider>
             </SignedIn>
