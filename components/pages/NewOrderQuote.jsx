@@ -8,7 +8,6 @@ import Image from "next/image"
 import logo from "@/public/logo.png"
 import { useRouter } from 'next/navigation'
 import { Button } from "@/components/ui/button"
-import { OrderForm } from "@/components/ui/custom-large/order-form"
 import { addOrder } from "@/app/actions/order-actions"
 import {
     Form,
@@ -405,7 +404,7 @@ export default function NewOrderQuote() {
                                     {/* Form for adding items to the order */}
                                     <div className="flex flex-col gap-2">
                                         <Label className="text-sm">Add items to the order</Label>
-                                        <OrderForm addItemToOrder={addItemToOrder} menuItems={menuItems} dishCategories={dishCategories} />
+                                        {/* <OrderForm addItemToOrder={addItemToOrder} menuItems={menuItems} dishCategories={dishCategories} /> */}
                                     </div>
                                 </div>
                             </div>

@@ -1,6 +1,6 @@
 'use client'
 
-import { Home, Settings, User2, ChevronUp, ShoppingCart } from "lucide-react"
+import { Home, Settings, ChevronUp, ShoppingCart } from "lucide-react"
 import { usePathname } from 'next/navigation'
 import Link from "next/link"
 
@@ -17,9 +17,6 @@ import {
 } from "@/components/ui/sidebar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { useClerk } from '@clerk/nextjs'
-import NewRestaurantForm from "@/components/ui/custom-large/new-restaurant-form";
-import AddMenuItems from "@/components/ui/custom-large/add-menu-items";
-import AddDishCategories from "@/components/ui/custom-large/add-dish-categories";
 
 // Menu items.
 const items = [

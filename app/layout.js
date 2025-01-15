@@ -3,7 +3,6 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from 'sonner'
 import "./globals.css";
 import { SignedIn, SignedOut } from "@clerk/nextjs";
-import { NavigationSignedOut } from "@/components/ui/custom-large/navigation";
 import { Suspense } from 'react';
 import Loading from "@/components/ui/custom-small/loading";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
