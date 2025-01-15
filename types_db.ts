@@ -36,6 +36,104 @@ export type Database = {
         }
         Relationships: []
       }
+      dish_categories: {
+        Row: {
+          created_at: string
+          id: string
+          name: string | null
+          restaurant_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name?: string | null
+          restaurant_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string | null
+          restaurant_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dish_categories_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      menu_items: {
+        Row: {
+          add_extra: Json | null
+          add_toppings: Json | null
+          choose_option: Json | null
+          choose_pasta: Json | null
+          choose_salad: Json | null
+          choose_soda: Json | null
+          choose_topping: Json | null
+          created_at: string
+          dish_category_id: string | null
+          general_pizza_mod: Json | null
+          id: string
+          name: string | null
+          remove_toppings: Json | null
+          restaurant_id: string | null
+          salad_toppings_mod: Json | null
+        }
+        Insert: {
+          add_extra?: Json | null
+          add_toppings?: Json | null
+          choose_option?: Json | null
+          choose_pasta?: Json | null
+          choose_salad?: Json | null
+          choose_soda?: Json | null
+          choose_topping?: Json | null
+          created_at?: string
+          dish_category_id?: string | null
+          general_pizza_mod?: Json | null
+          id?: string
+          name?: string | null
+          remove_toppings?: Json | null
+          restaurant_id?: string | null
+          salad_toppings_mod?: Json | null
+        }
+        Update: {
+          add_extra?: Json | null
+          add_toppings?: Json | null
+          choose_option?: Json | null
+          choose_pasta?: Json | null
+          choose_salad?: Json | null
+          choose_soda?: Json | null
+          choose_topping?: Json | null
+          created_at?: string
+          dish_category_id?: string | null
+          general_pizza_mod?: Json | null
+          id?: string
+          name?: string | null
+          remove_toppings?: Json | null
+          restaurant_id?: string | null
+          salad_toppings_mod?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dishes_dish_category_id_fkey"
+            columns: ["dish_category_id"]
+            isOneToOne: false
+            referencedRelation: "dish_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dishes_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       orders: {
         Row: {
           created_at: string
@@ -100,6 +198,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      restaurants: {
+        Row: {
+          business_address: string | null
+          business_email_address: string | null
+          business_name: string | null
+          business_phone_number: string | null
+          created_at: string
+          id: string
+        }
+        Insert: {
+          business_address?: string | null
+          business_email_address?: string | null
+          business_name?: string | null
+          business_phone_number?: string | null
+          created_at?: string
+          id?: string
+        }
+        Update: {
+          business_address?: string | null
+          business_email_address?: string | null
+          business_name?: string | null
+          business_phone_number?: string | null
+          created_at?: string
+          id?: string
+        }
+        Relationships: []
       }
       todos: {
         Row: {

@@ -61,3 +61,42 @@ export async function insertDishCategory(dishCategoryData) {
         return { success: true, message: "Dish category added successfully", dish_category_data: data };
     }
 }
+
+export async function getDishCategories(restaurantId) {
+    const { data, error } = await supabase.from("dish_categories").select("*").eq("restaurant_id", restaurantId);
+
+    if (error) {
+        return { success: false, message: "Error fetching dish categories" };
+    } else {
+        return { success: true, message: "Dish categories fetched successfully", dish_categories: data };
+    }
+}
+
+export async function insertMenuItem(item) {
+    console.log("Inserting menu item...");
+    console.log(item.chooseOption.options);
+
+    const { data, error } = await supabase.from("menu_items").insert({
+        name: item.name,
+        restaurant_id: item.restaurantId,
+        dish_category_id: item.dishCategoryId,
+        choose_option: item.chooseOption,
+        choose_topping: item.chooseTopping,
+        add_toppings: item.addToppings,
+        choose_salad: item.chooseSalad,
+        choose_pasta: item.choosePasta,
+        add_extra: item.addExtra,
+        remove_toppings: item.removeToppings,
+        general_pizza_mod: item.generalPizzaMod,
+        salad_toppings_mod: item.saladToppingsMod,
+        choose_soda: item.chooseSoda,
+    });
+
+    if (error) {
+        console.log("ERROR");
+        console.log(error);
+        return { success: false, message: "Error adding menu item" };
+    } else {
+        return { success: true, message: "Menu item added successfully", menu_item_data: data };
+    }
+}
