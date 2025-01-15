@@ -6,6 +6,8 @@ import { SignedIn, SignedOut } from "@clerk/nextjs";
 import { NavigationSignedOut } from "@/components/ui/custom-large/navigation";
 import { Suspense } from 'react';
 import Loading from "@/components/ui/custom-small/loading";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
+import { AppSidebar } from "@/components/app-sidebar"
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -37,8 +39,11 @@ export default function RootLayout({
         <body className="antialiased bg-background text-foreground">
           <Suspense fallback={<Loading />}>
             <SignedIn>
-              <NavigationSignedOut />
-              {children}
+              <SidebarProvider>
+                <AppSidebar />
+                {/* <NavigationSignedOut /> */}
+                {children}
+              </SidebarProvider>
             </SignedIn>
             <SignedOut>
               {children}
