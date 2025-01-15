@@ -1,6 +1,5 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
 import supabase from '@/utils/supabase/client';
 
 export async function addNewRestaurant(restaurantData) {
@@ -98,5 +97,17 @@ export async function insertMenuItem(item) {
         return { success: false, message: "Error adding menu item" };
     } else {
         return { success: true, message: "Menu item added successfully", menu_item_data: data };
+    }
+}
+
+// For right now, the restaurant name will be hardcoded to "Enzo's Pizzeria"
+export async function getMenuItemsAndCategories(restaurantId) {
+    const { data, error } = await supabase.from("menu_items").select("*").eq("restaurant_id", restaurantId);
+    const { data: dish_categories, error: categories_error } = await supabase.from("dish_categories").select("*").eq("restaurant_id", restaurantId);
+    
+    if (error || categories_error) {
+        return { success: false, message: "Error fetching menu items" };
+    } else {
+        return { success: true, message: "Menu items fetched successfully", menu_items: data, dish_categories: dish_categories };
     }
 }

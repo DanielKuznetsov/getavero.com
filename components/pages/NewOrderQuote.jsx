@@ -1,8 +1,7 @@
 'use client'
 
 import * as z from "zod"
-import React from "react"
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import Image from "next/image"
@@ -30,7 +29,8 @@ import {
 import { toast } from "sonner"
 import { Label } from "@/components/ui/label"
 import { pizzaToppings, pizzaMods, pizzaSizes, menuItems, salads, saladSizes, saladMods } from "@/lib/menu-data"
-import { Trash2, Edit } from 'lucide-react'
+import { Trash2 } from 'lucide-react'
+import { getMenuItemsAndCategories } from "@/app/actions/restaurant-actions"
 
 const formSchema = z.object({
     firstName: z.string().min(2, { message: "First name must be at least 2 characters." }),
@@ -72,10 +72,23 @@ export default function NewOrderQuote() {
     const [quoteNumber] = useState(() => Date.now())
     const [editingItem, setEditingItem] = useState(null)
     const [gratuity, setGratuity] = useState(0);
-
+    const [menuItems, setMenuItems] = useState([])
+    const [dishCategories, setDishCategories] = useState([])
     useEffect(() => {
         setIsClient(true)
     }, [])
+
+    useEffect(() => {
+        const fetchMenuItems = async () => {
+            const response = await getMenuItemsAndCategories(process.env.NEXT_PUBLIC_MAIN_RESTAURANT_ID);
+            if (response.success) {
+                setMenuItems(response.menu_items);
+                setDishCategories(response.dish_categories);
+            }
+        };
+
+        fetchMenuItems();
+    }, []);
 
     useEffect(() => {
         const gratuityAmount = form.getValues().gratuityAmount;
@@ -91,10 +104,10 @@ export default function NewOrderQuote() {
             return
         }
 
-        if (values.deliveryAddress === "" || values.deliveryAddress === null || values.deliveryInstructions === "" || values.deliveryInstructions === null) {
-            toast.error("Please fill out the delivery address and instructions before submitting.")
-            return
-        }
+        // if (values.deliveryAddress === "" || values.deliveryAddress === null || values.deliveryInstructions === "" || values.deliveryInstructions === null) {
+        //     toast.error("Please fill out the delivery address and instructions before submitting.")
+        //     return
+        // }
 
         setIsLoading(true)
 
@@ -389,9 +402,10 @@ export default function NewOrderQuote() {
                                         </div>
                                     </div>
 
+                                    {/* Form for adding items to the order */}
                                     <div className="flex flex-col gap-2">
                                         <Label className="text-sm">Add items to the order</Label>
-                                        <OrderForm addItemToOrder={addItemToOrder} menuItems={menuItems} />
+                                        <OrderForm addItemToOrder={addItemToOrder} menuItems={menuItems} dishCategories={dishCategories} />
                                     </div>
                                 </div>
                             </div>

@@ -5,8 +5,6 @@ import AddDishCategories from "@/components/ui/custom-large/add-dish-categories"
 // Need to import signed in and signed out components
 import { SignedIn, SignedOut } from "@clerk/nextjs";
 
-
-
 export default async function Home() {
 
   return (

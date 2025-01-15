@@ -71,7 +71,7 @@ export default function NewRestaurantForm() {
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <Button variant="outline">New Restaurant</Button>
+                <Button variant="outline" className="w-full">New Restaurant</Button>
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader>

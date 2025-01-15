@@ -1,6 +1,5 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
 import supabase from '@/utils/supabase/client';
 
 export async function addOrder(orderData) {

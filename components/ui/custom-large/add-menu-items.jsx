@@ -54,26 +54,12 @@ const standardJsonObjects = {
   ]
 }`,
     chooseTopping: `{
-  "pizza_sizes": [
+  "pizza_type": [
     {
-      "name": "10 inch",
-      "price": 0
+      "name": "10 inch"
     },
     {
-      "name": "14 inch",
-      "price": 0
-    },
-    {
-      "name": "18 inch",
-      "price": 0
-    },
-    {
-      "name": "23 inch",
-      "price": 0
-    },
-    {
-      "name": "slice",
-      "price": 0
+      "name": "slice"
     }
   ],
   "options": [
@@ -95,26 +81,12 @@ const standardJsonObjects = {
   ]
 }`,
     addToppings: `{
-  "pizza_sizes": [
+  "pizza_type": [
     {
-      "name": "10 inch",
-      "price": 0
+      "name": "10 inch"
     },
     {
-      "name": "14 inch",
-      "price": 0
-    },
-    {
-      "name": "18 inch",
-      "price": 0
-    },
-    {
-      "name": "23 inch",
-      "price": 0
-    },
-    {
-      "name": "slice",
-      "price": 0.75
+      "name": "slice"
     }
   ],
   "options": [
