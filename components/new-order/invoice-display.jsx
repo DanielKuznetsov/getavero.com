@@ -19,9 +19,9 @@ export default function InvoiceDisplay({
     return (
         <div className="mt-12">
             <div className="flex items-center justify-between">
-                <Image src={logo || "/placeholder.svg"} alt="Enzo's Pizzeria" width={150} height={150} style={{ width: 'auto', height: 'auto' }} />
+                <Image src={logo} alt="Enzo's Pizzeria" width={150} height={150} style={{ width: 'auto', height: 'auto' }} />
                 <div>
-                    <h4 className="scroll-m-20 text-xl font-semibold tracking-tight">Quote #{String(quoteNumber).slice(-5)}</h4>
+                    <h4 className="scroll-m-20 text-xl font-semibold tracking-tight">Quote #{quoteNumber}</h4>
                     <p>Created on: {new Date().toLocaleDateString()}</p>
                     <p>Prepared by: {form.getValues().preparedBy}</p>
                 </div>

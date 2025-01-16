@@ -13,6 +13,16 @@ import OrderForm from "@/components/new-order/order-form"
 import InvoiceDisplay from "@/components/new-order/invoice-display"
 import * as z from "zod"
 
+const generateQuoteNumber = () => {
+    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    for (let i = 0; i < 8; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+
+    return result;
+};
+
 export const formSchema = z.object({
     firstName: z.string().min(2, { message: "First name must be at least 2 characters." }),
     lastName: z.string().min(2, { message: "Last name must be at least 2 characters." }),
@@ -46,7 +56,7 @@ export default function NewOrderQuote() {
     const router = useRouter()
     const [isLoading, setIsLoading] = useState(false)
     const [orderItems, setOrderItems] = useState([])
-    const [quoteNumber, setQuoteNumber] = useState(() => typeof window !== 'undefined' ? Date.now() : 0)
+    const [quoteNumber, setQuoteNumber] = useState("")
     const [gratuity, setGratuity] = useState(0)
 
     const form = useForm({
@@ -75,10 +85,9 @@ export default function NewOrderQuote() {
     }, [form.watch('gratuityAmount'), form.watch('gratuityType'), orderItems]);
 
     useEffect(() => {
-        if (quoteNumber === 0) {
-            setQuoteNumber(Date.now())
-        }
-    }, [quoteNumber])
+        const generatedQuoteNumber = generateQuoteNumber();
+        setQuoteNumber(generatedQuoteNumber);
+    }, []);
 
     async function onSubmit(values) {
         if (orderItems.length === 0) {
@@ -86,6 +95,7 @@ export default function NewOrderQuote() {
             return
         }
 
+        console.log("values")
         console.log(values)
         console.log("orderItems")
         console.log(orderItems)
@@ -127,32 +137,32 @@ export default function NewOrderQuote() {
         setOrderItems(prevItems => [...prevItems, item])
     }
 
-    // function removeItemFromOrder(index) {
-    //     setOrderItems(prevItems => prevItems.filter((_, i) => i !== index))
-    // }
+    function removeItemFromOrder(index) {
+        setOrderItems(prevItems => prevItems.filter((_, i) => i !== index))
+    }
 
     function calculateSubtotal() {
         return orderItems.reduce((sum, item) => sum + item.totalPrice, 0) || 0;
     }
 
-    // function calculateTax() {
-    //     return calculateSubtotal() * 0.095
-    // }
+    function calculateTax() {
+        return calculateSubtotal() * 0.095
+    }
 
-    // function calculateGratuity() {
-    //     return gratuity;
-    // }
+    function calculateGratuity() {
+        return gratuity;
+    }
 
-    // function calculateInvoiceProcessingFee() {
-    //     return 4.99
-    // }
+    function calculateInvoiceProcessingFee() {
+        return 4.99
+    }
 
-    // function calculateTotal() {
-    //     return calculateSubtotal() + calculateTax() + calculateGratuity() + calculateInvoiceProcessingFee()
-    // }
+    function calculateTotal() {
+        return calculateSubtotal() + calculateTax() + calculateGratuity() + calculateInvoiceProcessingFee()
+    }
 
-    console.log("orderItems")
-    console.log(orderItems)
+    // console.log("orderItems")
+    // console.log(orderItems)
 
     return (
         <div className="py-4 px-6">
@@ -176,7 +186,7 @@ export default function NewOrderQuote() {
                 </Form>
             </div>
 
-            {/* <InvoiceDisplay 
+            <InvoiceDisplay
                 quoteNumber={quoteNumber}
                 form={form}
                 orderItems={orderItems}
@@ -186,7 +196,7 @@ export default function NewOrderQuote() {
                 calculateGratuity={calculateGratuity}
                 calculateInvoiceProcessingFee={calculateInvoiceProcessingFee}
                 calculateTotal={calculateTotal}
-            /> */}
+            />
         </div>
     )
 }

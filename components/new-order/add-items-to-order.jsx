@@ -39,7 +39,7 @@ export default function AddItemsToOrder({ addItemToOrder }) {
         fetchData()
     }, [])
 
-    const categoriesWithItems = dishCategories.filter(category => 
+    const categoriesWithItems = dishCategories.filter(category =>
         menuItems.some(item => item.dish_category_id === category.id)
     )
 
@@ -80,11 +80,11 @@ export default function AddItemsToOrder({ addItemToOrder }) {
                 </CommandList>
             </Command>
 
-            <ItemDialogWindow 
-                item={selectedItem} 
-                isDialogOpen={isDialogOpen} 
-                setIsDialogOpen={setIsDialogOpen} 
-                addItemToOrder={addItemToOrder} 
+            <ItemDialogWindow
+                item={selectedItem}
+                isDialogOpen={isDialogOpen}
+                setIsDialogOpen={setIsDialogOpen}
+                addItemToOrder={addItemToOrder}
             />
         </div>
     )
