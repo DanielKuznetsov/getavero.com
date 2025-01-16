@@ -4,6 +4,14 @@ import logo from "@/public/logo.png"
 import { Button } from "@/components/ui/button"
 import { Trash2 } from 'lucide-react'
 
+const shouldShowHalfWholeOption = (itemName) => {
+    const lowerCaseName = itemName.toLowerCase();
+    return lowerCaseName.includes('pizza') &&
+        !lowerCaseName.includes('pizza special') &&
+        !lowerCaseName.includes('calzone') &&
+        !lowerCaseName.includes('slice');
+};
+
 export default function InvoiceDisplay({
     quoteNumber,
     form,
@@ -77,8 +85,8 @@ export default function InvoiceDisplay({
                                 <p className="py-2 px-4 text-sm">${item.priceBreakdown.base.toFixed(2)}</p>
                                 <p className="py-2 px-4 text-sm">
                                     {/* {item.extraToppings && item.extraToppings.length > 0 && 'Extra Toppings'}
-                                    {item.removedToppings && item.removedToppings.length > 0 && 'Removed Toppings'}
-                                    {item.modifications && item.modifications.length > 0 && 'Modifications'} */}
+                                    {item.removedToppings && item.removedToppings.length > 0 && ', Removed Toppings'}
+                                    {item.modifications && item.modifications.length > 0 && ', Modifications'} */}
                                     -
                                 </p>
                                 <p className="py-2 px-4 text-sm">{item.notes || '-'}</p>
@@ -95,7 +103,15 @@ export default function InvoiceDisplay({
                                     <p className="py-2 px-4 text-sm"></p>
                                     <p className="py-2 px-4 text-sm">{item.quantity}</p>
                                     <p className="py-2 px-4 text-sm">${topping.price.toFixed(2)}</p>
-                                    <p className="py-2 px-4 text-sm">{topping.name}</p>
+                                    <p className="py-2 px-4 text-sm">
+                                        {topping.name}
+                                        {shouldShowHalfWholeOption(item.name) && (
+                                            <>
+                                                {' '}({topping.portion}
+                                                {topping.portion === 'half' && ` - ${topping.half}`})
+                                            </>
+                                        )}
+                                    </p>
                                     <p className="py-2 px-4 text-sm">-</p>
                                     <p className="py-2 px-4 text-sm">${(topping.price * item.quantity).toFixed(2)}</p>
                                     <p className="py-2 px-4 text-sm"></p>

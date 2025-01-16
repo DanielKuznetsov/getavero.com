@@ -11,11 +11,19 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { MinusCircle, PlusCircle } from 'lucide-react'
 import {
-    Accordion,
-    AccordionContent,
-    AccordionItem,
-    AccordionTrigger,
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
 } from "@/components/ui/accordion"
+
+const shouldShowHalfWholeOption = (itemName) => {
+  const lowerCaseName = itemName.toLowerCase();
+  return lowerCaseName.includes('pizza') && 
+         !lowerCaseName.includes('pizza special') &&
+         !lowerCaseName.includes('calzone') &&
+         !lowerCaseName.includes('slice');
+};
 
 export default function ItemDialogWindow({ item, isDialogOpen, setIsDialogOpen, addItemToOrder }) {
     const initialOptions = {
@@ -25,6 +33,8 @@ export default function ItemDialogWindow({ item, isDialogOpen, setIsDialogOpen, 
         pasta: '',
         soda: '',
         extraToppings: [],
+        extraToppingPortions: {},
+        extraToppingHalves: {},
         extras: [],
         removedToppings: [],
         modifications: [],
@@ -60,7 +70,7 @@ export default function ItemDialogWindow({ item, isDialogOpen, setIsDialogOpen, 
             modifications: [],
             total: 0
         };
-
+        
         // Base price from chosen size
         const chosenOption = item?.choose_option?.options.find(
             opt => opt.name === selectedOptions.size
@@ -70,9 +80,14 @@ export default function ItemDialogWindow({ item, isDialogOpen, setIsDialogOpen, 
         // Extra toppings price
         const toppingPrice = getToppingPrice();
         selectedOptions.extraToppings.forEach(topping => {
+            const portion = selectedOptions.extraToppingPortions[topping];
+            const half = selectedOptions.extraToppingHalves[topping];
+            const price = toppingPrice * (portion === 'half' ? 0.5 : 1);
             breakdown.toppings.push({
                 name: topping,
-                price: toppingPrice
+                price: price,
+                portion: portion,
+                half: half
             });
         });
 
@@ -99,7 +114,7 @@ export default function ItemDialogWindow({ item, isDialogOpen, setIsDialogOpen, 
         }
 
         breakdown.total = (
-            breakdown.base +
+            breakdown.base + 
             breakdown.toppings.reduce((sum, topping) => sum + topping.price, 0) +
             breakdown.extras.reduce((sum, extra) => sum + extra.price, 0) +
             breakdown.modifications.reduce((sum, mod) => sum + mod.price, 0)
@@ -118,7 +133,12 @@ export default function ItemDialogWindow({ item, isDialogOpen, setIsDialogOpen, 
                 salad: selectedOptions.salad || undefined,
                 pasta: selectedOptions.pasta || undefined,
                 soda: selectedOptions.soda || undefined,
-                extraToppings: priceBreakdown.toppings,
+                extraToppings: priceBreakdown.toppings.map(t => ({
+                    name: t.name,
+                    price: t.price,
+                    portion: t.portion,
+                    half: t.half
+                })),
                 extras: priceBreakdown.extras,
                 removedToppings: selectedOptions.removedToppings,
                 modifications: priceBreakdown.modifications,
@@ -136,7 +156,7 @@ export default function ItemDialogWindow({ item, isDialogOpen, setIsDialogOpen, 
             };
 
             // Remove empty arrays and undefined properties
-            Object.keys(orderItem).forEach(key =>
+            Object.keys(orderItem).forEach(key => 
                 (Array.isArray(orderItem[key]) && orderItem[key].length === 0) || orderItem[key] === undefined ? delete orderItem[key] : {}
             );
 
@@ -160,7 +180,7 @@ export default function ItemDialogWindow({ item, isDialogOpen, setIsDialogOpen, 
                 <DialogHeader>
                     <DialogTitle>{item?.name}</DialogTitle>
                 </DialogHeader>
-
+                
                 <div className="space-y-6">
                     {/* Choose Option Section */}
                     {item?.choose_option && (
@@ -168,8 +188,8 @@ export default function ItemDialogWindow({ item, isDialogOpen, setIsDialogOpen, 
                             <h3 className="font-semibold text-lg">Choose an Option</h3>
                             <RadioGroup
                                 value={selectedOptions.size}
-                                onValueChange={(value) =>
-                                    setSelectedOptions(prev => ({ ...prev, size: value }))
+                                onValueChange={(value) => 
+                                    setSelectedOptions(prev => ({...prev, size: value}))
                                 }
                             >
                                 {item.choose_option.options.map((option) => (
@@ -196,8 +216,8 @@ export default function ItemDialogWindow({ item, isDialogOpen, setIsDialogOpen, 
                                     <AccordionContent>
                                         <RadioGroup
                                             value={selectedOptions.topping}
-                                            onValueChange={(value) =>
-                                                setSelectedOptions(prev => ({ ...prev, topping: value }))
+                                            onValueChange={(value) => 
+                                                setSelectedOptions(prev => ({...prev, topping: value}))
                                             }
                                         >
                                             {item.choose_topping.options.map((option) => (
@@ -218,8 +238,8 @@ export default function ItemDialogWindow({ item, isDialogOpen, setIsDialogOpen, 
                                     <AccordionContent>
                                         <RadioGroup
                                             value={selectedOptions.salad}
-                                            onValueChange={(value) =>
-                                                setSelectedOptions(prev => ({ ...prev, salad: value }))
+                                            onValueChange={(value) => 
+                                                setSelectedOptions(prev => ({...prev, salad: value}))
                                             }
                                         >
                                             {item.choose_salad.options.map((option) => (
@@ -238,8 +258,6 @@ export default function ItemDialogWindow({ item, isDialogOpen, setIsDialogOpen, 
                                 <AccordionItem value="add-toppings">
                                     <AccordionTrigger>Add Extra Toppings</AccordionTrigger>
                                     <AccordionContent>
-
-
                                         <div className="grid grid-cols-1 gap-4">
                                             {item.add_toppings.options.map((option) => (
                                                 <div key={option.name} className="flex items-center justify-between">
@@ -248,22 +266,80 @@ export default function ItemDialogWindow({ item, isDialogOpen, setIsDialogOpen, 
                                                             id={`extra-${option.name}`}
                                                             checked={selectedOptions.extraToppings.includes(option.name)}
                                                             onCheckedChange={(checked) => {
-                                                                setSelectedOptions(prev => ({
-                                                                    ...prev,
-                                                                    extraToppings: checked
+                                                                setSelectedOptions(prev => {
+                                                                    const newExtraToppings = checked
                                                                         ? [...prev.extraToppings, option.name]
-                                                                        : prev.extraToppings.filter(t => t !== option.name)
-                                                                }))
+                                                                        : prev.extraToppings.filter(t => t !== option.name);
+                                                                    const newExtraToppingPortions = {...prev.extraToppingPortions};
+                                                                    if (checked) {
+                                                                        newExtraToppingPortions[option.name] = 'whole';
+                                                                    } else {
+                                                                        delete newExtraToppingPortions[option.name];
+                                                                    }
+                                                                    return {
+                                                                        ...prev,
+                                                                        extraToppings: newExtraToppings,
+                                                                        extraToppingPortions: newExtraToppingPortions
+                                                                    };
+                                                                });
                                                             }}
                                                         />
                                                         <Label htmlFor={`extra-${option.name}`}>{option.name}</Label>
                                                     </div>
-
-
+                                                    {selectedOptions.extraToppings.includes(option.name) && shouldShowHalfWholeOption(item.name) && (
+                                                        <div className="flex flex-col space-y-2">
+                                                            <RadioGroup
+                                                                value={selectedOptions.extraToppingPortions[option.name]}
+                                                                onValueChange={(value) => {
+                                                                    setSelectedOptions(prev => ({
+                                                                        ...prev,
+                                                                        extraToppingPortions: {
+                                                                            ...prev.extraToppingPortions,
+                                                                            [option.name]: value
+                                                                        },
+                                                                        extraToppingHalves: value === 'whole' 
+                                                                            ? { ...prev.extraToppingHalves, [option.name]: undefined }
+                                                                            : prev.extraToppingHalves
+                                                                    }));
+                                                                }}
+                                                            >
+                                                                <div className="flex items-center space-x-2">
+                                                                    <RadioGroupItem value="half" id={`half-${option.name}`} />
+                                                                    <Label htmlFor={`half-${option.name}`}>Half</Label>
+                                                                </div>
+                                                                <div className="flex items-center space-x-2">
+                                                                    <RadioGroupItem value="whole" id={`whole-${option.name}`} />
+                                                                    <Label htmlFor={`whole-${option.name}`}>Whole</Label>
+                                                                </div>
+                                                            </RadioGroup>
+                                                            {selectedOptions.extraToppingPortions[option.name] === 'half' && (
+                                                                <RadioGroup
+                                                                    value={selectedOptions.extraToppingHalves[option.name]}
+                                                                    onValueChange={(value) => {
+                                                                        setSelectedOptions(prev => ({
+                                                                            ...prev,
+                                                                            extraToppingHalves: {
+                                                                                ...prev.extraToppingHalves,
+                                                                                [option.name]: value
+                                                                            }
+                                                                        }));
+                                                                    }}
+                                                                >
+                                                                    <div className="flex items-center space-x-2">
+                                                                        <RadioGroupItem value="left" id={`left-${option.name}`} />
+                                                                        <Label htmlFor={`left-${option.name}`}>Left</Label>
+                                                                    </div>
+                                                                    <div className="flex items-center space-x-2">
+                                                                        <RadioGroupItem value="right" id={`right-${option.name}`} />
+                                                                        <Label htmlFor={`right-${option.name}`}>Right</Label>
+                                                                    </div>
+                                                                </RadioGroup>
+                                                            )}
+                                                        </div>
+                                                    )}
                                                     <span className="text-sm text-muted-foreground">
-                                                        +${getToppingPrice().toFixed(2)} each
+                                                        +${(getToppingPrice() * (selectedOptions.extraToppingPortions[option.name] === 'half' ? 0.5 : 1)).toFixed(2)}
                                                     </span>
-
                                                 </div>
                                             ))}
                                         </div>
@@ -278,8 +354,8 @@ export default function ItemDialogWindow({ item, isDialogOpen, setIsDialogOpen, 
                                     <AccordionContent>
                                         <RadioGroup
                                             value={selectedOptions.pasta}
-                                            onValueChange={(value) =>
-                                                setSelectedOptions(prev => ({ ...prev, pasta: value }))
+                                            onValueChange={(value) => 
+                                                setSelectedOptions(prev => ({...prev, pasta: value}))
                                             }
                                         >
                                             {item.choose_pasta.options.map((option) => (
@@ -424,8 +500,8 @@ export default function ItemDialogWindow({ item, isDialogOpen, setIsDialogOpen, 
                                     <AccordionContent>
                                         <RadioGroup
                                             value={selectedOptions.soda}
-                                            onValueChange={(value) =>
-                                                setSelectedOptions(prev => ({ ...prev, soda: value }))
+                                            onValueChange={(value) => 
+                                                setSelectedOptions(prev => ({...prev, soda: value}))
                                             }
                                         >
                                             {item.choose_soda.options.map((option) => (
@@ -446,7 +522,7 @@ export default function ItemDialogWindow({ item, isDialogOpen, setIsDialogOpen, 
                                     <Textarea
                                         placeholder="Add any special instructions or requests here..."
                                         value={selectedOptions.notes}
-                                        onChange={(e) => setSelectedOptions(prev => ({ ...prev, notes: e.target.value }))}
+                                        onChange={(e) => setSelectedOptions(prev => ({...prev, notes: e.target.value}))}
                                     />
                                 </AccordionContent>
                             </AccordionItem>
@@ -466,7 +542,15 @@ export default function ItemDialogWindow({ item, isDialogOpen, setIsDialogOpen, 
                                 <span>Extra Toppings:</span>
                                 {priceBreakdown.toppings.map((topping, index) => (
                                     <div key={index} className="flex justify-between pl-4">
-                                        <span>{topping.name}:</span>
+                                        <span>
+                                            {topping.name} 
+                                            {shouldShowHalfWholeOption(item.name) && (
+                                                <>
+                                                    ({topping.portion}
+                                                    {topping.portion === 'half' && ` - ${topping.half}`})
+                                                </>
+                                            )}
+                                        </span>
                                         <span>+${topping.price.toFixed(2)}</span>
                                     </div>
                                 ))}
@@ -527,7 +611,7 @@ export default function ItemDialogWindow({ item, isDialogOpen, setIsDialogOpen, 
                                 <PlusCircle className="h-4 w-4" />
                             </Button>
                         </div>
-                        <Button
+                        <Button 
                             onClick={handleAddItem}
                             className="min-w-[200px]"
                         >
@@ -539,3 +623,4 @@ export default function ItemDialogWindow({ item, isDialogOpen, setIsDialogOpen, 
         </Dialog>
     )
 }
+
