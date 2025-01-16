@@ -66,9 +66,15 @@ export default function NewOrderQuote() {
         const gratuityAmount = form.getValues().gratuityAmount;
         const gratuityType = form.getValues().gratuityType;
         const subtotal = calculateSubtotal();
-        const newGratuity = gratuityType === '$'
+        let newGratuity = gratuityType === '$'
             ? gratuityAmount
-            : (subtotal * (gratuityAmount / 100)); // Possible NaN if gratuityAmount is not a valid number
+            : (subtotal * (gratuityAmount / 100));
+
+        if (isNaN(newGratuity)) {
+            console.log("newGratuity is NaN")
+            newGratuity = 0;
+        }
+
         setGratuity(newGratuity);
     }, [form.watch('gratuityAmount'), form.watch('gratuityType'), orderItems]);
 
