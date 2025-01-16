@@ -64,6 +64,16 @@ export async function getDishCategories(restaurantId) {
     }
 }
 
+export async function getMenuItems(restaurantId) {
+    const { data, error } = await supabase.from("menu_items").select("*").eq("restaurant_id", restaurantId);
+    
+    if (error) {
+        return { success: false, message: "Error fetching menu items" };
+    } else {
+        return { success: true, message: "Menu items fetched successfully", menu_items: data };
+    }
+}
+
 // For right now, the restaurant name will be hardcoded to "Enzo's Pizzeria"
 export async function getMenuItemsAndCategories(restaurantId) {
     const { data, error } = await supabase.from("menu_items").select("*").eq("restaurant_id", restaurantId);
@@ -162,7 +172,7 @@ export async function insertMenuItems(restaurantId) {
         }
 
         return {
-            success: true,
+            success: false,
             message: message
         };
 

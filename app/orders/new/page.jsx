@@ -1,4 +1,4 @@
-import NewOrderQuote from "@/components/pages/NewOrderQuote";
+import NewOrderQuote from "@/components/new-order/new-order-quote";
 
 export default function NewOrderPage() {
     return (
