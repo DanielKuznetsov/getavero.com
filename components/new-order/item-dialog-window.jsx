@@ -49,9 +49,9 @@ export default function ItemDialogWindow({ item, isDialogOpen, setIsDialogOpen, 
     const calculatePriceBreakdown = () => {
         const breakdown = {
             base: 0,
-            toppings: 0,
-            extras: 0,
-            modifications: 0,
+            toppings: [],
+            extras: [],
+            modifications: [],
             total: 0
         };
         
@@ -63,15 +63,21 @@ export default function ItemDialogWindow({ item, isDialogOpen, setIsDialogOpen, 
 
         // Extra toppings price
         const toppingPrice = getToppingPrice();
-        breakdown.toppings = selectedOptions.extraToppings.length * toppingPrice;
+        selectedOptions.extraToppings.forEach(topping => {
+            breakdown.toppings.push({
+                name: topping,
+                price: toppingPrice
+            });
+        });
 
         // Add extra items price
         if (item?.add_extra?.options) {
             selectedOptions.extras.forEach(extraName => {
                 const extraItem = item.add_extra.options.find(opt => opt.name === extraName);
-                if (extraItem?.price) {
-                    breakdown.extras += extraItem.price;
-                }
+                breakdown.extras.push({
+                    name: extraName,
+                    price: extraItem?.price || 0
+                });
             });
         }
 
@@ -79,13 +85,20 @@ export default function ItemDialogWindow({ item, isDialogOpen, setIsDialogOpen, 
         if (item?.general_pizza_mod?.options) {
             selectedOptions.modifications.forEach(modName => {
                 const mod = item.general_pizza_mod.options.find(opt => opt.name === modName);
-                if (mod?.price) {
-                    breakdown.modifications += mod.price;
-                }
+                breakdown.modifications.push({
+                    name: modName,
+                    price: mod?.price || 0
+                });
             });
         }
 
-        breakdown.total = (breakdown.base + breakdown.toppings + breakdown.extras + breakdown.modifications) * selectedOptions.quantity;
+        breakdown.total = (
+            breakdown.base + 
+            breakdown.toppings.reduce((sum, topping) => sum + topping.price, 0) +
+            breakdown.extras.reduce((sum, extra) => sum + extra.price, 0) +
+            breakdown.modifications.reduce((sum, mod) => sum + mod.price, 0)
+        ) * selectedOptions.quantity;
+
         return breakdown;
     }
 
@@ -99,24 +112,30 @@ export default function ItemDialogWindow({ item, isDialogOpen, setIsDialogOpen, 
                 salad: selectedOptions.salad || undefined,
                 pasta: selectedOptions.pasta || undefined,
                 soda: selectedOptions.soda || undefined,
-                extraToppings: selectedOptions.extraToppings.length > 0 ? selectedOptions.extraToppings : undefined,
-                extras: selectedOptions.extras.length > 0 ? selectedOptions.extras : undefined,
-                removedToppings: selectedOptions.removedToppings.length > 0 ? selectedOptions.removedToppings : undefined,
-                modifications: selectedOptions.modifications.length > 0 ? selectedOptions.modifications : undefined,
-                saladMods: selectedOptions.saladMods.length > 0 ? selectedOptions.saladMods : undefined,
+                extraToppings: priceBreakdown.toppings,
+                extras: priceBreakdown.extras,
+                removedToppings: selectedOptions.removedToppings,
+                modifications: priceBreakdown.modifications,
+                saladMods: selectedOptions.saladMods,
                 quantity: selectedOptions.quantity,
                 notes: selectedOptions.notes || undefined,
-                priceBreakdown,
+                priceBreakdown: {
+                    base: priceBreakdown.base,
+                    toppings: priceBreakdown.toppings,
+                    extras: priceBreakdown.extras,
+                    modifications: priceBreakdown.modifications,
+                    total: priceBreakdown.total
+                },
                 totalPrice: priceBreakdown.total
-            }
+            };
 
-            // Remove undefined properties
+            // Remove empty arrays and undefined properties
             Object.keys(orderItem).forEach(key => 
-                orderItem[key] === undefined && delete orderItem[key]
+                (Array.isArray(orderItem[key]) && orderItem[key].length === 0) || orderItem[key] === undefined ? delete orderItem[key] : {}
             );
 
-            addItemToOrder(orderItem)
-            setIsDialogOpen(false)
+            addItemToOrder(orderItem);
+            setIsDialogOpen(false);
         }
     }
 
@@ -128,7 +147,7 @@ export default function ItemDialogWindow({ item, isDialogOpen, setIsDialogOpen, 
     }
 
     const priceBreakdown = calculatePriceBreakdown();
-    
+
     return (
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogContent className="max-w-2xl">
@@ -328,7 +347,9 @@ export default function ItemDialogWindow({ item, isDialogOpen, setIsDialogOpen, 
                                                 }))
                                             }}
                                         />
-                                        <Label htmlFor={`mod-${option.name}`}>{option.name}</Label>
+                                        <Label htmlFor={`mod-${option.name}`}>
+                                            {option.name.replace(/0$/, '')}
+                                        </Label>
                                         {option.price != 0 && (
                                             <span className="text-sm text-muted-foreground">
                                                 +${option.price.toFixed(2)}
@@ -401,25 +422,40 @@ export default function ItemDialogWindow({ item, isDialogOpen, setIsDialogOpen, 
                     {/* Price Breakdown Section */}
                     <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
-                            <span>Base Price:</span>
+                            <span>Base Price ({selectedOptions.size}):</span>
                             <span>${priceBreakdown.base.toFixed(2)}</span>
                         </div>
-                        {priceBreakdown.toppings > 0 && (
-                            <div className="flex justify-between">
+                        {priceBreakdown.toppings.length > 0 && (
+                            <div>
                                 <span>Extra Toppings:</span>
-                                <span>+${priceBreakdown.toppings.toFixed(2)}</span>
+                                {priceBreakdown.toppings.map((topping, index) => (
+                                    <div key={index} className="flex justify-between pl-4">
+                                        <span>{topping.name}:</span>
+                                        <span>+${topping.price.toFixed(2)}</span>
+                                    </div>
+                                ))}
                             </div>
                         )}
-                        {priceBreakdown.extras > 0 && (
-                            <div className="flex justify-between">
+                        {priceBreakdown.extras.length > 0 && (
+                            <div>
                                 <span>Extras:</span>
-                                <span>+${priceBreakdown.extras.toFixed(2)}</span>
+                                {priceBreakdown.extras.map((extra, index) => (
+                                    <div key={index} className="flex justify-between pl-4">
+                                        <span>{extra.name}:</span>
+                                        <span>+${extra.price.toFixed(2)}</span>
+                                    </div>
+                                ))}
                             </div>
                         )}
-                        {priceBreakdown.modifications > 0 && (
-                            <div className="flex justify-between">
+                        {priceBreakdown.modifications.length > 0 && (
+                            <div>
                                 <span>Modifications:</span>
-                                <span>+${priceBreakdown.modifications.toFixed(2)}</span>
+                                {priceBreakdown.modifications.map((mod, index) => (
+                                    <div key={index} className="flex justify-between pl-4">
+                                        <span>{mod.name}:</span>
+                                        <span>+${mod.price.toFixed(2)}</span>
+                                    </div>
+                                ))}
                             </div>
                         )}
                         {selectedOptions.quantity > 1 && (

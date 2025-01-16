@@ -19,7 +19,6 @@ const generateQuoteNumber = () => {
     for (let i = 0; i < 8; i++) {
         result += chars.charAt(Math.floor(Math.random() * chars.length));
     }
-
     return result;
 };
 
@@ -51,7 +50,6 @@ export const defaultFormValues = {
     gratuityType: "$"
 }
 
-
 export default function NewOrderQuote() {
     const router = useRouter()
     const [isLoading, setIsLoading] = useState(false)
@@ -64,23 +62,13 @@ export default function NewOrderQuote() {
         defaultValues: defaultFormValues,
     })
 
-    // useEffect(() => {
-    //     const fetchMenuItems = async () => {
-    //         const response = await getMenuItemsAndCategories(process.env.NEXT_PUBLIC_MAIN_RESTAURANT_ID);
-    //         if (response.success) {
-    //             setMenuItems(response.menu_items);
-    //             setDishCategories(response.dish_categories);
-    //         }
-    //     };
-
-    //     fetchMenuItems();
-    // }, []);
-
     useEffect(() => {
         const gratuityAmount = form.getValues().gratuityAmount;
         const gratuityType = form.getValues().gratuityType;
         const subtotal = calculateSubtotal();
-        const newGratuity = gratuityType === '$' ? gratuityAmount : (subtotal * (gratuityAmount / 100));
+        const newGratuity = gratuityType === '$'
+            ? gratuityAmount
+            : (subtotal * (gratuityAmount / 100)); // Possible NaN if gratuityAmount is not a valid number
         setGratuity(newGratuity);
     }, [form.watch('gratuityAmount'), form.watch('gratuityType'), orderItems]);
 
@@ -95,42 +83,43 @@ export default function NewOrderQuote() {
             return
         }
 
-        console.log("values")
-        console.log(values)
-        console.log("orderItems")
-        console.log(orderItems)
+        console.log("values", values)
+        console.log("orderItems", orderItems)
 
-        // setIsLoading(true)
+        // Uncomment the following code when ready to submit the order
+        /*
+        setIsLoading(true)
 
-        // try {
-        //     const orderData = {
-        //         ...values,
-        //         orderItems,
-        //         subtotal: calculateSubtotal(),
-        //         tax: calculateTax(),
-        //         gratuity: calculateGratuity(),
-        //         processingFee: calculateInvoiceProcessingFee(),
-        //         total: calculateTotal(),
-        //         quoteNumber: quoteNumber,
-        //         created_on: new Date().toLocaleDateString()
-        //     }
+        try {
+            const orderData = {
+                ...values,
+                orderItems,
+                subtotal: calculateSubtotal(),
+                tax: calculateTax(),
+                gratuity: calculateGratuity(),
+                processingFee: calculateInvoiceProcessingFee(),
+                total: calculateTotal(),
+                quoteNumber: quoteNumber,
+                created_on: new Date().toLocaleDateString()
+            }
 
-        //     const response = await addOrder(orderData)
+            const response = await addOrder(orderData)
 
-        //     if (response.success) {
-        //         toast.success(response.message)
-        //         form.reset(defaultFormValues)
-        //         setOrderItems([])
-        //         router.push("/")
-        //     } else {
-        //         toast.error(response.message)
-        //     }
-        // } catch (error) {
-        //     console.error("Error submitting form:", error)
-        //     toast.error("An error occurred while submitting the form.")
-        // } finally {
-        //     setIsLoading(false)
-        // }
+            if (response.success) {
+                toast.success(response.message)
+                form.reset(defaultFormValues)
+                setOrderItems([])
+                router.push("/")
+            } else {
+                toast.error(response.message)
+            }
+        } catch (error) {
+            console.error("Error submitting form:", error)
+            toast.error("An error occurred while submitting the form.")
+        } finally {
+            setIsLoading(false)
+        }
+        */
     }
 
     function addItemToOrder(item) {
@@ -160,9 +149,6 @@ export default function NewOrderQuote() {
     function calculateTotal() {
         return calculateSubtotal() + calculateTax() + calculateGratuity() + calculateInvoiceProcessingFee()
     }
-
-    // console.log("orderItems")
-    // console.log(orderItems)
 
     return (
         <div className="py-4 px-6">
