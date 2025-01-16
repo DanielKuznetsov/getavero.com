@@ -172,7 +172,7 @@ export async function insertMenuItems(restaurantId) {
         }
 
         return {
-            success: false,
+            success: true,
             message: message
         };
 

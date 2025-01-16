@@ -33,7 +33,7 @@ const COMMON_OPTIONS = {
         medium: { name: "14 inch", toppingPrice: 2.00 },
         large: { name: "18 inch", toppingPrice: 2.50 },
         xlarge: { name: "23 inch", toppingPrice: 3.00 },
-        calzone: { name: "Calzone", toppingPrice: 2.50 }
+        calzone: { name: "Calzone", toppingPrice: 2.99 }
     },
 
     extraOptions: [
@@ -42,11 +42,16 @@ const COMMON_OPTIONS = {
 
     generalPizzaMods: {
         options: [
+            { name: "No Cheese", price: 0 },
+            { name: "Light Cheese", price: 0 },
+            { name: "No Sauce", price: 0 },
+            { name: "Light Sauce", price: 0 },
+            { name: "Extra Sauce", price: 0.50 },
+            { name: "Double Cut", price: 0 },
             { name: "Well Done", price: 0 },
             { name: "Light Cook", price: 0 },
-            { name: "Extra Sauce", price: 0.50 },
-            { name: "Light Sauce", price: 0 },
-            { name: "No Sauce", price: 0 }
+            { name: "Square Cut", price: 0 },
+            { name: "16 Slices", price: 0 },
         ]
     }
 }
@@ -55,6 +60,7 @@ export const menuItems = {
     "Lunch Specials": [
         {
             name: "#1 Pizza Special Lunch Special",
+            description: "1 slice, 1 topping, choice of salad, all you can drink.",
             choose_option: {
                 options: [
                     { name: "Lunch", price: 10.95 }
@@ -73,6 +79,7 @@ export const menuItems = {
         },
         {
             name: "#2 Pasta Lunch Special",
+            description: "Penne or spaghetti, choice of salad, all you can drink.",
             choose_option: {
                 options: [
                     { name: "Lunch", price: 13.95 }
@@ -88,11 +95,31 @@ export const menuItems = {
             choose_salad: {
                 options: COMMON_OPTIONS.saladOptions
             }
+        },
+        {
+            name: "#3 Calzone Lunch Special",
+            description: "One topping, choice of salad. All you can drink.. Please allow 10-15 minutes.",
+            choose_option: {
+                options: [
+                    { name: "Lunch", price: 12.95 }
+                ]
+            },
+            choose_topping: {
+                options: COMMON_OPTIONS.toppings
+            },
+            add_toppings: {
+                options: COMMON_OPTIONS.toppings,
+                pricing: COMMON_OPTIONS.pizzaSizes.slice.toppingPrice
+            },
+            choose_salad: {
+                options: COMMON_OPTIONS.saladOptions
+            }
         }
     ],
     "Pizza": [
         {
             name: "Cheese Pizza",
+            description: "Classic cheese or create your own pizza.",
             choose_option: {
                 options: [
                     { name: "10 inch", price: 13.99 },
@@ -108,9 +135,6 @@ export const menuItems = {
                     price: size.toppingPrice
                 }))
             },
-            remove_toppings: {
-                options: COMMON_OPTIONS.toppings
-            },
             // Price is different for each general pizza mod
             general_pizza_mod: COMMON_OPTIONS.generalPizzaMods
         }
@@ -118,9 +142,23 @@ export const menuItems = {
     "Calzones": [
         {
             name: "Calzone",
+            description: "Includes One Topping. Additional Toppings $2.99 each.",
             choose_option: {
                 options: [
-                    { name: "Regular", price: 11.95 }
+                    { name: "Large", price: 15.50 }
+                ]
+            },
+            add_toppings: {
+                options: COMMON_OPTIONS.toppings,
+                pricing: COMMON_OPTIONS.pizzaSizes.calzone.toppingPrice
+            }
+        },
+        {
+            name: "White Calzone",
+            description: "Ricotta, mozzarella, alfredo, garlic, spinach.",
+            choose_option: {
+                options: [
+                    { name: "Large", price: 15.50 }
                 ]
             },
             add_toppings: {

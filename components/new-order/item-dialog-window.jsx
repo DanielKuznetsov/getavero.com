@@ -128,9 +128,7 @@ export default function ItemDialogWindow({ item, isDialogOpen, setIsDialogOpen, 
     }
 
     const priceBreakdown = calculatePriceBreakdown();
-
-    console.log("item")
-    console.log(item)
+    
     return (
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogContent className="max-w-2xl">
