@@ -76,8 +76,9 @@ export async function getMenuItemsAndCategories(restaurantId) {
     }
 }
 
-export async function insertMenuItems() {
-    const RESTAURANT_ID = "256075a0-74b1-41eb-be8c-c89d0808774e";
+export async function insertMenuItems(restaurantId) {
+    const RESTAURANT_ID = restaurantId;
+    // const RESTAURANT_ID = "256075a0-74b1-41eb-be8c-c89d0808774e";
     let duplicates = [];
     let inserted = 0;
 

@@ -12,7 +12,7 @@ export default function Home() {
   const handleInsertMenuItems = async () => {
     setIsLoading(true)
     try {
-      const result = await insertMenuItems()
+      const result = await insertMenuItems(process.env.NEXT_PUBLIC_RESTAURANT_ID)
       if (result.success) {
         toast.success(result.message)
       } else {
