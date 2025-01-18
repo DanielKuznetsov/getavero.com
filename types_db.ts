@@ -75,6 +75,7 @@ export type Database = {
           choose_soda: Json | null
           choose_topping: Json | null
           created_at: string
+          description: string | null
           dish_category_id: string | null
           general_pizza_mod: Json | null
           id: string
@@ -92,6 +93,7 @@ export type Database = {
           choose_soda?: Json | null
           choose_topping?: Json | null
           created_at?: string
+          description?: string | null
           dish_category_id?: string | null
           general_pizza_mod?: Json | null
           id?: string
@@ -109,6 +111,7 @@ export type Database = {
           choose_soda?: Json | null
           choose_topping?: Json | null
           created_at?: string
+          description?: string | null
           dish_category_id?: string | null
           general_pizza_mod?: Json | null
           id?: string
@@ -145,6 +148,7 @@ export type Database = {
           id: string
           invoice_processing_fee: string | null
           order_itself: Json | null
+          order_status: string | null
           order_type: string | null
           payment_method: string | null
           prepared_by: string | null
@@ -163,6 +167,7 @@ export type Database = {
           id?: string
           invoice_processing_fee?: string | null
           order_itself?: Json | null
+          order_status?: string | null
           order_type?: string | null
           payment_method?: string | null
           prepared_by?: string | null
@@ -181,6 +186,7 @@ export type Database = {
           id?: string
           invoice_processing_fee?: string | null
           order_itself?: Json | null
+          order_status?: string | null
           order_type?: string | null
           payment_method?: string | null
           prepared_by?: string | null

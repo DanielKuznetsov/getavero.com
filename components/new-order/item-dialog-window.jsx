@@ -1,6 +1,6 @@
 'use client'
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
@@ -179,6 +179,7 @@ export default function ItemDialogWindow({ item, isDialogOpen, setIsDialogOpen, 
             <DialogContent className="max-w-2xl">
                 <DialogHeader>
                     <DialogTitle>{item?.name}</DialogTitle>
+                    <DialogDescription>{item?.description}</DialogDescription>
                 </DialogHeader>
                 
                 <div className="space-y-6">
@@ -529,7 +530,6 @@ export default function ItemDialogWindow({ item, isDialogOpen, setIsDialogOpen, 
                         </Accordion>
                     </div>
 
-                    <Separator />
 
                     {/* Price Breakdown Section */}
                     <div className="space-y-2 text-sm">

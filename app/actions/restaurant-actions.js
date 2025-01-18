@@ -138,6 +138,7 @@ export async function insertMenuItems(restaurantId) {
 
                 const menuItem = {
                     name: item.name,
+                    description: item.description || null,
                     restaurant_id: RESTAURANT_ID,
                     dish_category_id: categoryId,
                     choose_option: item.choose_option || null,
