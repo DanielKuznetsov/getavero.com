@@ -27,7 +27,7 @@ const shouldShowHalfWholeOption = (itemName) => {
 
 export default function ItemDialogWindow({ item, isDialogOpen, setIsDialogOpen, addItemToOrder }) {
     const initialOptions = {
-        size: item?.choose_option?.options[0]?.name || '',
+        size: '',
         topping: '',
         salad: '',
         pasta: '',
@@ -47,7 +47,10 @@ export default function ItemDialogWindow({ item, isDialogOpen, setIsDialogOpen, 
 
     useEffect(() => {
         if (isDialogOpen) {
-            setSelectedOptions(initialOptions)
+            setSelectedOptions({
+                ...initialOptions,
+                size: item?.choose_option?.options[0]?.name || '',
+            })
         }
     }, [isDialogOpen, item])
 
@@ -254,6 +257,28 @@ export default function ItemDialogWindow({ item, isDialogOpen, setIsDialogOpen, 
                                 </AccordionItem>
                             )}
 
+                            {/* Choose Pasta Section */}
+                            {item?.choose_pasta && (
+                                <AccordionItem value="choose-pasta">
+                                    <AccordionTrigger>Choose Pasta</AccordionTrigger>
+                                    <AccordionContent>
+                                        <RadioGroup
+                                            value={selectedOptions.pasta}
+                                            onValueChange={(value) => 
+                                                setSelectedOptions(prev => ({...prev, pasta: value}))
+                                            }
+                                        >
+                                            {item.choose_pasta.options.map((option) => (
+                                                <div key={option.name} className="flex items-center space-x-2">
+                                                    <RadioGroupItem value={option.name} id={`pasta-${option.name}`} />
+                                                    <Label htmlFor={`pasta-${option.name}`}>{option.name}</Label>
+                                                </div>
+                                            ))}
+                                        </RadioGroup>
+                                    </AccordionContent>
+                                </AccordionItem>
+                            )}
+
                             {/* Add Extra Toppings Section */}
                             {item?.add_toppings && (
                                 <AccordionItem value="add-toppings">
@@ -348,28 +373,6 @@ export default function ItemDialogWindow({ item, isDialogOpen, setIsDialogOpen, 
                                 </AccordionItem>
                             )}
 
-                            {/* Choose Pasta Section */}
-                            {item?.choose_pasta && (
-                                <AccordionItem value="choose-pasta">
-                                    <AccordionTrigger>Choose Pasta</AccordionTrigger>
-                                    <AccordionContent>
-                                        <RadioGroup
-                                            value={selectedOptions.pasta}
-                                            onValueChange={(value) => 
-                                                setSelectedOptions(prev => ({...prev, pasta: value}))
-                                            }
-                                        >
-                                            {item.choose_pasta.options.map((option) => (
-                                                <div key={option.name} className="flex items-center space-x-2">
-                                                    <RadioGroupItem value={option.name} id={`pasta-${option.name}`} />
-                                                    <Label htmlFor={`pasta-${option.name}`}>{option.name}</Label>
-                                                </div>
-                                            ))}
-                                        </RadioGroup>
-                                    </AccordionContent>
-                                </AccordionItem>
-                            )}
-
                             {/* Add Extra Section */}
                             {item?.add_extra && (
                                 <AccordionItem value="add-extra">
@@ -454,7 +457,7 @@ export default function ItemDialogWindow({ item, isDialogOpen, setIsDialogOpen, 
                                                     <Label htmlFor={`mod-${option.name}`}>
                                                         {option.name.replace(/0$/, '')}
                                                     </Label>
-                                                    {option.price != 0 && (
+                                                    {option.price !== 0 && (
                                                         <span className="text-sm text-muted-foreground">
                                                             +${option.price.toFixed(2)}
                                                         </span>
@@ -487,6 +490,11 @@ export default function ItemDialogWindow({ item, isDialogOpen, setIsDialogOpen, 
                                                         }}
                                                     />
                                                     <Label htmlFor={`salad-mod-${option.name}`}>{option.name}</Label>
+                                                    {option.price !== 0 && (
+                                                        <span className="text-sm text-muted-foreground">
+                                                            +${option.price.toFixed(2)}
+                                                        </span>
+                                                    )}
                                                 </div>
                                             ))}
                                         </div>
@@ -529,7 +537,6 @@ export default function ItemDialogWindow({ item, isDialogOpen, setIsDialogOpen, 
                             </AccordionItem>
                         </Accordion>
                     </div>
-
 
                     {/* Price Breakdown Section */}
                     <div className="space-y-2 text-sm">

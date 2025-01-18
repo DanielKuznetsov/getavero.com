@@ -23,8 +23,6 @@ export default function InvoiceDisplay({
     calculateInvoiceProcessingFee,
     calculateTotal
 }) {
-    console.log("orderItems")
-    console.log(orderItems)
     return (
         <div className="mt-12">
             <div className="flex items-center justify-between">
@@ -84,10 +82,12 @@ export default function InvoiceDisplay({
                                 <p className="py-2 px-4 text-sm">{item.quantity}</p>
                                 <p className="py-2 px-4 text-sm">${item.priceBreakdown.base.toFixed(2)}</p>
                                 <p className="py-2 px-4 text-sm">
-                                    {/* {item.extraToppings && item.extraToppings.length > 0 && 'Extra Toppings'}
+                                    {item.extraToppings && item.extraToppings.length > 0 && 'Extra Toppings'}
                                     {item.removedToppings && item.removedToppings.length > 0 && ', Removed Toppings'}
-                                    {item.modifications && item.modifications.length > 0 && ', Modifications'} */}
-                                    -
+                                    {item.modifications && item.modifications.length > 0 && ', Modifications'}
+                                    {(!item.extraToppings || item.extraToppings.length === 0) &&
+                                     (!item.removedToppings || item.removedToppings.length === 0) &&
+                                     (!item.modifications || item.modifications.length === 0) && '-'}
                                 </p>
                                 <p className="py-2 px-4 text-sm">{item.notes || '-'}</p>
                                 <p className="py-2 px-4 text-sm">${item.totalPrice.toFixed(2)}</p>
@@ -138,6 +138,34 @@ export default function InvoiceDisplay({
                                     <p className="py-2 px-4 text-sm">{mod.name}</p>
                                     <p className="py-2 px-4 text-sm">-</p>
                                     <p className="py-2 px-4 text-sm">${((mod.price || 0) * item.quantity).toFixed(2)}</p>
+                                    <p className="py-2 px-4 text-sm"></p>
+                                </div>
+                            ))}
+
+                            {/* Display other options (topping, salad, pasta, soda) */}
+                            {['topping', 'salad', 'pasta', 'soda'].map((optionType) => (
+                                item[optionType] && (
+                                    <div key={`${index}-${optionType}`} className="grid grid-cols-7 border-b border-gray-200 bg-gray-50">
+                                        <p className="py-2 px-4 text-sm"></p>
+                                        <p className="py-2 px-4 text-sm">{item.quantity}</p>
+                                        <p className="py-2 px-4 text-sm">$0.00</p>
+                                        <p className="py-2 px-4 text-sm">{optionType.charAt(0).toUpperCase() + optionType.slice(1)}: {item[optionType]}</p>
+                                        <p className="py-2 px-4 text-sm">-</p>
+                                        <p className="py-2 px-4 text-sm">$0.00</p>
+                                        <p className="py-2 px-4 text-sm"></p>
+                                    </div>
+                                )
+                            ))}
+
+                            {/* Display salad modifications */}
+                            {item.saladMods && item.saladMods.map((mod, modIndex) => (
+                                <div key={`${index}-salad-${modIndex}`} className="grid grid-cols-7 border-b border-gray-200 bg-gray-50">
+                                    <p className="py-2 px-4 text-sm"></p>
+                                    <p className="py-2 px-4 text-sm">{item.quantity}</p>
+                                    <p className="py-2 px-4 text-sm">$0.00</p>
+                                    <p className="py-2 px-4 text-sm">Salad Mod: {mod}</p>
+                                    <p className="py-2 px-4 text-sm">-</p>
+                                    <p className="py-2 px-4 text-sm">$0.00</p>
                                     <p className="py-2 px-4 text-sm"></p>
                                 </div>
                             ))}

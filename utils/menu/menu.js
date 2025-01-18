@@ -75,65 +75,65 @@ const COMMON_OPTIONS = {
 }
 
 export const menuItems = {
-    "Lunch Specials": [
-        {
-            name: "#1 Pizza Special Lunch Special",
-            description: "1 slice, 1 topping, choice of salad, all you can drink.",
-            choose_option: {
-                options: [
-                    { name: "Lunch", price: 10.95 }
-                ]
-            },
-            choose_topping: {
-                options: COMMON_OPTIONS.toppings
-            },
-            add_toppings: {
-                options: COMMON_OPTIONS.toppings,
-                pricing: COMMON_OPTIONS.pizzaSizes.slice.toppingPrice
-            },
-            choose_salad: {
-                options: COMMON_OPTIONS.saladOptions
-            }
-        },
-        {
-            name: "#2 Pasta Lunch Special",
-            description: "Penne or spaghetti, choice of salad, all you can drink.",
-            choose_option: {
-                options: [
-                    { name: "Lunch", price: 13.95 }
-                ]
-            },
-            choose_pasta: {
-                options: COMMON_OPTIONS.pastaOptions
-            },
-            // Price is different for each extra option
-            add_extra: {
-                options: COMMON_OPTIONS.extraOptions
-            },
-            choose_salad: {
-                options: COMMON_OPTIONS.saladOptions
-            }
-        },
-        {
-            name: "#3 Calzone Lunch Special",
-            description: "One topping, choice of salad. All you can drink.. Please allow 10-15 minutes.",
-            choose_option: {
-                options: [
-                    { name: "Lunch", price: 12.95 }
-                ]
-            },
-            choose_topping: {
-                options: COMMON_OPTIONS.toppings
-            },
-            add_toppings: {
-                options: COMMON_OPTIONS.toppings,
-                pricing: COMMON_OPTIONS.pizzaSizes.slice.toppingPrice
-            },
-            choose_salad: {
-                options: COMMON_OPTIONS.saladOptions
-            }
-        }
-    ],
+    // "Lunch Specials": [
+    //     {
+    //         name: "#1 Pizza Special Lunch Special",
+    //         description: "1 slice, 1 topping, choice of salad, all you can drink.",
+    //         choose_option: {
+    //             options: [
+    //                 { name: "Lunch", price: 10.95 }
+    //             ]
+    //         },
+    //         choose_topping: {
+    //             options: COMMON_OPTIONS.toppings
+    //         },
+    //         add_toppings: {
+    //             options: COMMON_OPTIONS.toppings,
+    //             pricing: COMMON_OPTIONS.pizzaSizes.slice.toppingPrice
+    //         },
+    //         choose_salad: {
+    //             options: COMMON_OPTIONS.saladOptions
+    //         }
+    //     },
+    //     {
+    //         name: "#2 Pasta Lunch Special",
+    //         description: "Penne or spaghetti, choice of salad, all you can drink.",
+    //         choose_option: {
+    //             options: [
+    //                 { name: "Lunch", price: 13.95 }
+    //             ]
+    //         },
+    //         choose_pasta: {
+    //             options: COMMON_OPTIONS.pastaOptions
+    //         },
+    //         // Price is different for each extra option
+    //         add_extra: {
+    //             options: COMMON_OPTIONS.extraOptions
+    //         },
+    //         choose_salad: {
+    //             options: COMMON_OPTIONS.saladOptions
+    //         }
+    //     },
+    //     {
+    //         name: "#3 Calzone Lunch Special",
+    //         description: "One topping, choice of salad. All you can drink.. Please allow 10-15 minutes.",
+    //         choose_option: {
+    //             options: [
+    //                 { name: "Lunch", price: 12.95 }
+    //             ]
+    //         },
+    //         choose_topping: {
+    //             options: COMMON_OPTIONS.toppings
+    //         },
+    //         add_toppings: {
+    //             options: COMMON_OPTIONS.toppings,
+    //             pricing: COMMON_OPTIONS.pizzaSizes.slice.toppingPrice
+    //         },
+    //         choose_salad: {
+    //             options: COMMON_OPTIONS.saladOptions
+    //         }
+    //     }
+    // ],
     "Pizza": [
         {
             name: "Cheese Pizza",
