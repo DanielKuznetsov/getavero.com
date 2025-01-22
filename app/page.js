@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { SignedIn, SignedOut } from "@clerk/nextjs"
 import { LoadingButton } from "@/components/ui/custom-small/loading-button"
-import { insertMenuItems } from "@/app/actions/restaurant-actions"
+import { prepareAndTriggerMenuItemInsertion } from "@/app/actions/restaurant-actions"
 import { toast } from "sonner"
 
 export default function Home() {
@@ -12,7 +12,7 @@ export default function Home() {
   const handleInsertMenuItems = async () => {
     setIsLoading(true)
     try {
-      const result = await insertMenuItems(process.env.NEXT_PUBLIC_RESTAURANT_ID)
+      const result = await prepareAndTriggerMenuItemInsertion(process.env.NEXT_PUBLIC_RESTAURANT_ID)
       if (result.success) {
         toast.success(result.message)
       } else {

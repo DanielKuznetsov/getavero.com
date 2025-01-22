@@ -37,6 +37,7 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
     "framer-motion": "^11.5.4",
+    "inngest": "^3.30.0",
     "input-otp": "^1.4.1",
     "lucide-react": "^0.441.0",
     "next": "14.2.13",
