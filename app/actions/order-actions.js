@@ -30,7 +30,7 @@ export async function addOrder(orderData) {
         prepared_by: orderData.preparedBy,
 
         order_itself: JSON.stringify(orderData.orderItems),
-        quote_number: String(orderData.quoteNumber).slice(-5),
+        quote_number: orderData.quoteNumber,
         subtotal: orderData.subtotal,
         tax: orderData.tax,
         gratuity: orderData.gratuity,

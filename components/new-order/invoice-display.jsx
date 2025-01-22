@@ -34,7 +34,8 @@ export default function InvoiceDisplay({
                 </div>
             </div>
 
-            <div className="flex items-center justify-between mt-16">
+            {/* This is a quote and not an invoice yet */}
+            {/* <div className="flex items-center justify-between mt-16">
                 <div>
                     <p className="leading-7 [&:not(:first-child)]:mt-6">Billing from:</p>
                     <h4 className="scroll-m-20 text-xl font-semibold tracking-tight">Enzo's Pizzeria</h4>
@@ -56,7 +57,7 @@ export default function InvoiceDisplay({
                         <p className="text-sm leading-6">Vendor ID: <span className="text-gray-500">158062004</span></p>
                     </div>
                 </div>
-            </div>
+            </div> */}
 
             <div className="mt-12">
                 <div className="grid grid-cols-7 border-t border-b border-gray-200">

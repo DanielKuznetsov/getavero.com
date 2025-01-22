@@ -89,11 +89,12 @@ export default function NewOrderQuote() {
             return
         }
 
+        console.log("Submitting order...")
         console.log("values", values)
         console.log("orderItems", orderItems)
 
         // Uncomment the following code when ready to submit the order
-        /*
+        // /*
         setIsLoading(true)
 
         try {
@@ -125,7 +126,7 @@ export default function NewOrderQuote() {
         } finally {
             setIsLoading(false)
         }
-        */
+        // */
     }
 
     function addItemToOrder(item) {
