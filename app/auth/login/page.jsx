@@ -272,11 +272,11 @@ export default function LoginPage() {
                             )}
                         </FormProvider>
 
-                        {!verifying && (
+                        {/* {!verifying && (
                             <div className='flex flex-col gap-2 text-[14px] font-light text-neutral-500 items-center mt-6'>
                                 <Link href="/auth/signup">Create an account</Link>
                             </div>
-                        )}
+                        )} */}
                     </motion.div>
                 </div>
             </div>
