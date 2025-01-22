@@ -1,5 +1,3 @@
-'use server'
-
 import supabase from '@/utils/supabase/client';
 
 const COMMON_OPTIONS = {
