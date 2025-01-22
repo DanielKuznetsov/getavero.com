@@ -1224,7 +1224,9 @@ export async function insertMenuItemsUtil(restaurantId) {
 
         return {
             success: true,
-            message: message
+            message: message,
+            inserted: inserted,
+            duplicates: duplicates.length
         };
 
     } catch (error) {
