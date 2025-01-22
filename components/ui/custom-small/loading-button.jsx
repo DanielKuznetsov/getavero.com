@@ -5,16 +5,22 @@ import { ButtonProps } from "@/components/ui/button"
 export function LoadingButton({ 
     isLoading, 
     children, 
+    loadingText = "Loading...",
+    buttonText = "Submit",
     ...props 
 }) {
     return (
         <Button {...props} disabled={isLoading}>
             {isLoading ? (
                 <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Loading...
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />   
+                    {loadingText}
                 </>
-            ) : children}
+            ) : (
+                <>
+                    {buttonText}
+                </>
+            )}
         </Button>
     )
 }
