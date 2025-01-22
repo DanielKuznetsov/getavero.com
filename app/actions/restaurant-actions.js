@@ -67,7 +67,7 @@ export async function getDishCategories(restaurantId) {
 
 export async function getMenuItems(restaurantId) {
     const { data, error } = await supabase.from("menu_items").select("*").eq("restaurant_id", restaurantId);
-    
+
     if (error) {
         return { success: false, message: "Error fetching menu items" };
     } else {
@@ -192,51 +192,11 @@ export async function prepareAndTriggerMenuItemInsertion(restaurantId) {
     const RESTAURANT_ID = restaurantId;
 
     try {
-        // Prepare the data to be sent to Inngest
-        const menuItemsData = [];
-
-        for (const [categoryName, items] of Object.entries(menuItems)) {
-            // Check if category exists
-            const { data: existingCategory } = await supabase
-                .from('dish_categories')
-                .select('id')
-                .eq('restaurant_id', RESTAURANT_ID)
-                .eq('name', categoryName)
-                .single();
-
-            let categoryId;
-            if (!existingCategory) {
-                const { data: newCategory, error: categoryError } = await supabase
-                    .from('dish_categories')
-                    .insert({
-                        name: categoryName,
-                        restaurant_id: RESTAURANT_ID
-                    })
-                    .select()
-                    .single();
-
-                if (categoryError) throw categoryError;
-                categoryId = newCategory.id;
-            } else {
-                categoryId = existingCategory.id;
-            }
-
-            for (const item of items) {
-                menuItemsData.push({
-                    ...item,
-                    restaurant_id: RESTAURANT_ID,
-                    dish_category_id: categoryId,
-                    category_name: categoryName
-                });
-            }
-        }
-
         // Trigger the Inngest event
         await inngest.send({
             name: "menu.items.insert",
-            data: { 
+            data: {
                 restaurantId: RESTAURANT_ID,
-                menuItems: menuItemsData
             },
         });
 
